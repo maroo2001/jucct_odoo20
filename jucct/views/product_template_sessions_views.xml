@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Separate list View for Sessions Button (editable inline) -->
+    <record id="view_product_template_sessions_inline_list" model="ir.ui.view">
+        <field name="name">academy.session.inline.list</field>
+        <field name="model">academy.session</field>
+        <field name="arch" type="xml">
+            <list string="Sessions">
+                <field name="name"/>
+                <field name="program_type" column_invisible="1"/>
+                <field name="program_id" column_invisible="1"/>
+                <field name="academy_id" readonly="1"/>
+                <field name="date_start"/>
+                <field name="date_end"/>
+                <field name="trainer_id"/>
+                <field name="location"/>
+                <field name="status" 
+                       widget="badge"
+                       decoration-info="status == 'draft'"
+                       decoration-success="status == 'scheduled'"
+                       decoration-muted="status == 'done'"
+                       decoration-danger="status == 'cancelled'"/>
+            </list>
+        </field>
+    </record>
+</odoo>

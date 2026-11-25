@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    
+    <record id="educational_program_search_view" model="ir.ui.view">
+        <field name="name">product.template.search.educational</field>
+        <field name="model">product.template</field>
+        <field name="priority" eval="1"/> 
+        <field name="arch" type="xml">
+            <search string="Educational Programs">
+                <field name="name" string="Program Name"
+                        filter_domain="[('name', 'ilike', self)]"/>
+                <field name="program_type"/>
+                <field name="venue"/>
+                <field name="academy_id"/>
+                <field name="status"/>
+                
+                <filter string="Active Programs" name="filter_active"
+                        domain="[('status', '=', 'active')]"/>
+                <filter string="Pending Programs" name="filter_pending"
+                        domain="[('status', '=', 'pending')]"/>
+                <filter string="Expired Programs" name="filter_expired"
+                        domain="[('status', '=', 'expired')]"/>
+                
+                <separator/>
+            
+                
+                <separator/>
+                
+                <filter string="Inside" name="filter_inside"
+                        domain="[('venue', '=', 'inside')]"/>
+                <filter string="Outside" name="filter_outside"
+                        domain="[('venue', '=', 'outside')]"/>
+                <filter string="Online" name="filter_online"
+                        domain="[('venue', '=', 'online')]"/>
+                
+                <group>
+                    <filter string="Status" name="group_status"
+                            context="{'group_by': 'status'}"/>
+                    <filter string="Location" name="group_venue"
+                            context="{'group_by': 'venue'}"/>
+                    <filter string="Academy" name="group_academy"
+                            context="{'group_by': 'academy_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="educational_jucct_list_view" model="ir.ui.view">
+        <field name="name">product.template.list.educational_product</field>
+        <field name="model">product.template</field>
+        <field name="priority" eval="1"/>
+        <field name="arch" type="xml">
+            <list string="Educational Programs">
+                <field name="name"/>
+                <field name="program_type"/>
+                <field name="venue" string="Location"/>
+                <field name="status" readonly="1"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="list_price" string="Price" widget="monetary" sum = "1" options="{'currency_field': 'currency_id'}"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="educational_jucct_form_view" model="ir.ui.view">
+        <field name="name">product.template.form.educational_product</field>
+        <field name="model">product.template</field>
+        <field name="priority" eval="1"/>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="open_academy_offerings_action"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="account_balance"
+                                string="Academies offrings"
+                                invisible="context.get('hide_offered', False) or status != 'active'">
+                            <field name="offering_count" widget="statinfo" string="offrings"/>
+                        </button>
+                        
+                        <button name="action_view_sessions"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="calendar_month"
+                                invisible="not is_program">
+                            <field name="session_count" widget="statinfo" string="Sessions"/>
+                        </button>
+                    </div>
+                    
+                    <field name="id" invisible="1"/>
+                    <field name="is_program" invisible="1"/>
+                    <field name="image_1920" widget="image" class="oe_avatar"/>
+
+                    <div class="oe_title">
+                        <label for="name" string="Program Name"/>
+                        <h1>
+                            <field name="name" widget="text" options="{'line_breaks': False}"
+                                    placeholder="Program Name" required="1"/>
+                        </h1>
+                    </div>
+
+                    <group name="group_general">
+                        <group>
+                            <field name="pro_read" invisible="1"/>
+                            <field name="program_type" readonly="pro_read == 0"/>
+                            <field name="venue" string="Location"/>
+                        </group>
+                        <group>
+                            <field name="status" readonly="program_type == 'diploma'"/>
+                            <field name="list_price" string="Price" widget="monetary"
+                                   options="{'currency_field': 'currency_id'}"  required="1"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Approvals" name="approval_page">
+                            <field name="approval_ids">
+                                <list string="Approvals">
+                                    <field name="approval_number"/>
+                                    <field name="approval_file" widget="binary"/>
+                                    <field name="start_date"/>
+                                    <field name="end_date"/>
+                                </list>
+                                <form string="Approval">
+                                    <group>
+                                        <field name="approval_number"/>
+                                        <field name="approval_file" widget="binary"/>
+                                        <field name="start_date"/>
+                                        <field name="end_date"/>
+                                    </group>
+                                </form>
+                            </field>
+                        </page>
+
+                        <page string="Sales" name="sales" invisible="1 or not sale_ok">
+                            <group>
+                                <group string="Extra Info">
+                                    <field name="product_tag_ids" widget="many2many_tags"/>
+                                </group>
+                                <group string="Quotation Description">
+                                    <field colspan="2" name="description_sale" nolabel="1"
+                                            placeholder="This note is added to sales orders and invoices."/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Purchase" name="purchase" invisible="1 or not purchase_ok"/>
+                        <page string="Inventory" name="inventory"
+                                    groups="product.group_stock_packaging"
+                                    invisible="type in ['service','combo']"/>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="educational_program_action" model="ir.actions.act_window">
+        <field name="name">Educational Programs</field>
+        <field name="res_model">product.template</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('is_program', '=', True)]</field>
+        <field name="context">{
+            'default_is_program': True,
+            'search_default_filter_active': 1,
+        }</field>
+        <field name="search_view_id" ref="educational_program_search_view"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first Educational Program
+            </p>
+        </field>
+    </record>
+    
+
+</odoo>

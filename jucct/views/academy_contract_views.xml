@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Academy Contract Form View -->
+    <record id="academy_contract_form_view" model="ir.ui.view">
+        <field name="name">academy.contract.form</field>
+        <field name="model">academy.contract</field>
+        <field name="arch" type="xml">
+            <form string="Academy Contract">
+                <sheet>                    
+                    <div class="oe_title">
+                        <h1>
+                            <field name="contract_number" placeholder="Contract Number" required="1"/>
+                        </h1>
+                        <div>
+                            <field name="status" widget="badge" 
+                                   decoration-success="status == 'active'"
+                                   decoration-danger="status == 'expired'"
+                                   decoration-warning="status == 'pending'"/>
+                        </div>
+                    </div>
+                    
+                    <group>
+                        <group string="Academy Information">
+                            <field name="academy_id" required="1"/>
+                            <field name="responsible_employee_id"/>
+                        </group>
+                        <group string="Contract Period">
+                            <field name="start_date" required="1"/>
+                            <field name="end_date" required="1"/>
+                            <field name="revenue_share" required="1"/>
+                        </group>
+                    </group>
+                    
+                    <group string="Notes / Attachments">
+                        <field name="notes" placeholder="Enter contract-specific notes..." nolabel="1"/>
+                        <field name="attachment_ids" widget="many2many_binary" 
+                               options="{'no_create': True}" string="Contract Files"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Academy Contract Tree View -->
+    <record id="academy_contract_tree_view" model="ir.ui.view">
+        <field name="name">academy.contract.tree</field>
+        <field name="model">academy.contract</field>
+        <field name="arch" type="xml">
+            <list string="Academy Contracts">
+                <field name="contract_number"/>
+                <field name="start_date"/>
+                <field name="end_date"/>
+                <field name="status" widget="badge" 
+                       decoration-success="status == 'active'"
+                       decoration-danger="status == 'expired'"
+                       decoration-warning="status == 'pending'"/>
+                <field name="revenue_share"/>
+                <field name="responsible_employee_id"/>
+                <field name="is_current" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+
+
+    <!-- Academy Contract Action -->
+    <record id="academy_contract_action" model="ir.actions.act_window">
+        <field name="name">Academy Contracts</field>
+        <field name="res_model">academy.contract</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{}</field>
+        <field name="help" type="html"> 
+            <p class="o_view_nocontent_smiling_face">
+                Create your first Academy Contract!
+            </p>
+            <p>
+                Academy contracts define the terms and conditions between your organization and partner academies.
+                Each contract includes commission rates, duration, and responsible employees.
+            </p>
+        </field>
+    </record>
+
+
+</odoo>

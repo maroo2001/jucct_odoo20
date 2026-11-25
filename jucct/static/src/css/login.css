@@ -1,0 +1,333 @@
+/* Jadara Diploma Center - Simple Clean Login */
+:root {
+    --jadara-purple: #2d3267;
+    --jadara-green: #539273;
+    --jadara-gray: #666666;
+    --jadara-white: #ffffff;
+    --jadara-light-bg: #f5f5f5;
+    --border-color: #dddddd;
+}
+
+/* Page background */
+html, body {
+    height: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+body, .bg-100 {
+    background: var(--jadara-light-bg) !important;
+    display: flex !important;
+    justify-content: center !important; 
+    align-items: center !important;     
+    min-width: 60vh !important;       
+}
+
+/* Container centering */
+.container.py-5 {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    min-height: 100vh !important;
+    padding: 0 !important;
+}
+
+/* Main card - Simple white box */
+.card-body {
+    padding: 30px !important;
+    background: var(--jadara-white) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+    border-radius: 8px !important;
+    border: 1px solid var(--border-color) !important;
+    max-width: 420px !important;  
+    width: 90% !important;
+    margin: 0 auto !important;
+    position: relative;
+    overflow: visible;
+}
+
+/* Remove colored top bar */
+.card-body::before {
+    display: none !important;
+}
+
+/* Form container */
+.oe_single_form {
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    padding: 40px 40px 30px 40px !important;
+    background: transparent !important;
+}
+
+/* Logo area - Bigger without text */
+.text-center.pb-3.border-bottom.mb-4 img {
+    display: none !important;
+}
+
+.text-center.pb-3.border-bottom.mb-4 {
+    background-image: url('../img/Jadara-Diploma-center-logo.jpg') !important;
+    background-size: contain !important;
+    background-repeat: no-repeat !important;
+    background-position: center top !important;
+    height: 180px !important;
+    margin-bottom: 2.5rem !important;
+    border-bottom: none !important; 
+    padding-top: 30px !important;
+    position: relative;
+}
+
+.text-center.pb-3.border-bottom.mb-4::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: #e0e0e0;
+    bottom: -20px; 
+}
+
+/* Form Groups */
+.form-group {
+    margin-bottom: 20px !important;
+}
+
+/* Labels - Simple */
+label {
+    color: var(--jadara-purple) !important;
+    font-weight: 500 !important;
+    margin-bottom: 6px !important;
+    font-size: 14px !important;
+    display: block !important;
+}
+
+/* Input fields - Simple */
+.form-control {
+    border: 1px solid var(--border-color) !important;
+    border-radius: 4px !important;
+    padding: 10px 12px !important;
+    transition: border-color 0.2s ease !important;
+    background: var(--jadara-white) !important;
+    font-size: 14px !important;
+    color: var(--jadara-purple) !important;
+}
+
+.form-control:focus {
+    border-color: var(--jadara-green) !important;
+    box-shadow: none !important;
+    background: var(--jadara-white) !important;
+    outline: none !important;
+    transform: none !important;
+}
+
+.form-control::placeholder {
+    color: #999999 !important;
+}
+
+/* Login button - Simple green */
+.btn.btn-primary {
+    background: var(--jadara-green) !important;
+    border: none !important;
+    border-radius: 4px !important;
+    padding: 12px 24px !important;
+    font-size: 15px !important;
+    font-weight: 500 !important;
+    color: var(--jadara-white) !important;
+    transition: background 0.2s ease !important;
+    box-shadow: none !important;
+    text-transform: none !important;
+    letter-spacing: 0 !important;
+    width: 100% !important;
+    margin-top: 10px !important;
+}
+
+.btn.btn-primary:hover {
+    background: #4a8268 !important;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+.btn.btn-primary:active {
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+/* Reset Password link - Simple */
+.btn-sm,
+.btn-group-sm>.btn {
+    color: var(--jadara-gray) !important;
+    transition: color 0.2s ease !important;
+    font-weight: 400 !important;
+    font-size: 13px !important;
+}
+
+.btn-sm:hover {
+    color: var(--jadara-green) !important;
+}
+
+/* Links - Simple */
+a {
+    color: var(--jadara-gray) !important;
+    text-decoration: none !important;
+    transition: color 0.2s ease !important;
+    font-weight: 400 !important;
+}
+
+a:hover {
+    color: var(--jadara-green) !important;
+}
+
+/* Hide "Don't have an account?" */
+.mt-2.text-center a[href*="signup"],
+a.btn.btn-link.btn-sm[href*="signup"] {
+    display: none !important;
+}
+/* Hide "Log in as superuser" button */
+button[name="redirect"][value="/web/become"],
+.oe_login_buttons button.btn-link,
+.o_login_auth {
+    display: none !important;
+}
+
+/* Hide only Powered by Odoo */
+.border-end.pe-2 + a,
+a[href*="odoo.com"][target="_blank"] {
+    display: none !important;
+}
+
+/* Choose a user - Keep but simple */
+.btn-link,
+a.btn-link,
+button.btn-link,
+.o_user_switch_btn,
+button.o_user_switch_btn.btn.btn-link {
+    color: var(--jadara-gray) !important;
+    text-decoration: none !important;
+    transition: color 0.2s ease !important;
+    font-weight: 400 !important;
+    font-size: 13px !important;
+}
+
+.btn-link:hover,
+a.btn-link:hover,
+button.btn-link:hover,
+.o_user_switch_btn:hover {
+    color: var(--jadara-green) !important;
+}
+
+.list-group {
+    background: var(--jadara-white) !important;
+    border-radius: 8px !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+    overflow: hidden !important;
+    border: 1px solid var(--border-color) !important;
+}
+
+.list-group-item {
+    background-color: var(--jadara-white) !important;
+    border: none !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    color: var(--jadara-purple) !important;
+    padding: 12px 16px !important;
+    transition: background 0.2s ease !important;
+    font-weight: 400 !important;
+    font-size: 14px !important;
+}
+
+.list-group-item:hover {
+    background: #f9f9f9 !important;
+    color: var(--jadara-green) !important;
+    border-left: none !important;
+}
+
+.list-group-item:last-child {
+    border-bottom: none !important;
+}
+
+.m-0, h1, h2, h3, h4, h5 {
+    color: var(--jadara-purple) !important;
+    font-weight: 600 !important;
+}
+
+.o_user_switch_btn,
+button.o_user_switch_btn,
+.btn-link.o_user_switch_btn,
+button[type="button"].btn.btn-link.o_user_switch_btn {
+    display: none !important;
+}
+
+.form-label .o_user_switch_btn,
+label .o_user_switch_btn,
+.d-flex.justify-content-between .o_user_switch_btn {
+    display: none !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .card-body {
+        border-radius: 8px !important;
+        max-width: 95% !important;
+        padding: 20px !important;
+    }
+    .oe_single_form {
+        padding: 30px 25px !important;
+    }
+    .text-center.pb-3.border-bottom.mb-4 {
+        height: 150px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .card-body {
+        max-width: 100% !important;
+        padding: 15px !important;
+    }
+    .oe_single_form {
+        padding: 20px 15px !important;
+    }
+}
+
+@media (max-width: 360px) {
+    .card-body {
+        padding: 12px !important;
+    }
+    .oe_single_form {
+        padding: 15px 10px !important;
+    }
+    .text-center.pb-3.border-bottom.mb-4 {
+        height: 120px !important;
+        background-size: 80% !important;
+    }
+    label, .form-control, .btn.btn-primary {
+        font-size: 13px !important;
+    }
+}
+
+/* Responsive for tablets (iPad, Galaxy Tab, etc.) */
+@media (max-width: 1024px) and (min-width: 769px) {
+    .card-body {
+        max-width: 600px !important;
+        padding: 25px !important;
+    }
+    .oe_single_form {
+        padding: 35px 30px !important;
+    }
+    .text-center.pb-3.border-bottom.mb-4 {
+        height: 160px !important;
+        background-size: contain !important;
+    }
+}
+
+/* Responsive for small laptops (e.g. 13-inch) */
+@media (max-width: 1366px) and (min-width: 1025px) {
+    .card-body {
+        max-width: 500px !important;
+        padding: 30px !important;
+    }
+    .oe_single_form {
+        padding: 40px 35px !important;
+    }
+    .text-center.pb-3.border-bottom.mb-4 {
+        height: 180px !important;
+    }
+}

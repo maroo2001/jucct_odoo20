@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Updated Students List View to match import fields -->
+    <record id="student_jucct_list_view" model="ir.ui.view">
+        <field name="name">res.partner.list.student</field>
+        <field name="model">res.partner</field>
+        <field name="arch" type="xml">
+            <list string="Students">
+                <control>
+                    <button type="action" 
+                            name="%(action_student_bulk_import)d" 
+                            string="Bulk Import Students"
+                            icon="upload"
+                            class="btn-primary"/>
+                </control>
+                
+                <!-- Basic Student Info - matches import fields -->
+                <field name="name" string="Student Name"/>
+                <field name="national_id" string="National ID"/>
+                <field name="university_id" string="Student ID"/>
+                <field name="email" string="Email"/>
+                <field name="phone" string="Phone"/>
+                <field name="date_of_birth" string="Date of Birth" optional="show"/>
+                <field name="country_id" string="Country" optional="hide"/>
+                
+                <!-- Enrollment Info - matches import enrolment fields -->
+                <field name="enrolled_programs_display" string="Program" optional="show"/>
+                <field name="enrolled_academies_display" string="Academy" optional="show"/>
+                <field name="enrolled_offerings_display" string="Class Offering" optional="show"/>
+                <field name="enrollment_years" string="Year" optional="show"/>
+                <field name="enrollment_semesters" string="Semester" optional="show"/>
+                
+                <!-- Additional useful fields -->
+                <field name="enrollment_count" string="Enrollments" optional="hide"/>
+            </list>
+        </field>
+    </record>
+    
+    <!-- Updated Search View to match import fields -->
+    <record id="student_jucct_search_view" model="ir.ui.view">
+        <field name="name">res.partner.search.student</field>
+        <field name="model">res.partner</field>
+        <field name="arch" type="xml">
+            <search string="Search Students">
+                <!-- Search fields matching import -->
+                <field name="name" string="Student Name" filter_domain="[('name', 'ilike', self)]"/>
+                <field name="national_id" string="National ID"/>
+                <field name="university_id" string="Student ID"/>
+                <field name="email" string="Email"/>
+                <field name="phone" string="Phone"/>
+                <field name="date_of_birth" string="Date of Birth"/>
+                <separator/>
+                
+                <!-- Date filters removed as they need special handling -->
+                
+                <group>
+                    <filter string="Country" name="group_country" context="{'group_by': 'country_id'}"/>
+                    <filter string="Academy" name="group_academy" context="{'group_by': 'enrolled_academies_display'}"/>
+                    <filter string="Program" name="group_program" context="{'group_by': 'enrolled_programs_display'}"/>
+                    <filter string="Year" name="group_year" context="{'group_by': 'enrollment_years'}"/>
+                    <filter string="Semester" name="group_semester" context="{'group_by': 'enrollment_semesters'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+</odoo>

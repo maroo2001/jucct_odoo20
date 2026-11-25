@@ -1,0 +1,175 @@
+<odoo>
+    <!-- ################################################################ -->
+    <!-- Enhanced Trainer Form View -->
+    <record id="trainer_jucct_form_view" model="ir.ui.view">
+        <field name="name">res.partner.form.trainer</field>
+        <field name="model">res.partner</field>
+        <field name="arch" type="xml">
+            <form string="Trainer">
+                <sheet>
+                     <!-- Smart Buttons -->
+                    <div class="oe_button_box" name="button_box">
+
+                        <!-- Certifications Button -->
+                        <button name="action_trainer_certifications" 
+                                type="object" 
+                                class="oe_stat_button" 
+                                icon="workspace_premium">
+                            <field name="certification_count" widget="statinfo" string="Certifications"/>
+                        </button>
+                        <!-- Sessions Button -->
+                        <button name="action_trainer_sessions" 
+                                type="object" 
+                                class="oe_stat_button" 
+                                icon="calendar_month">
+                            <field name="trainer_session_count" widget="statinfo" string="Sessions"/>
+                        </button>
+
+                        <!-- Programs Button -->
+                        <button name="action_trainer_programs" 
+                                type="object" 
+                                class="oe_stat_button" 
+                                icon="book">
+                            <field name="program_count" widget="statinfo" string="Programs"/>
+                        </button>
+                    </div>
+
+
+                    <!-- Trainer Photo -->
+                    <field name="image_1920" widget="image" class="oe_avatar"
+                           options="{'preview_image': 'image_128'}"/>
+
+                    <!-- Trainer Name -->
+                    <div class="oe_title mb24">
+                        <h1>
+                            <field name="name" placeholder="Trainer Name" required="1"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <!-- Left Column: Basic Information -->
+                        <group string="Basic Information">
+                            <field name="is_trainer" readonly="1" invisible="1"/>
+                            <field name="trainer_type" required="1"/>
+                            <field name="trainer_academy_id" 
+                                   invisible="trainer_type != 'academy'"
+                                   required="trainer_type == 'academy'"
+                            domain="[('edu_type', '=', 'academy'), ('contract_status', '=', 'active')]"
+                                   options="{'no_create': True, 'no_open' : True}"/>
+                            <field name="active" widget="boolean_toggle"/>
+                            <field name="email" widget="email"/>
+                            <field name="country_id" options="{'no_create': True}"/>
+                            
+                            <!-- Phone with Country Code -->
+                            <label for="phone" string="Phone"/>
+                            <div style="display:flex; align-items:center; gap:0px; margin-left:-2px;">
+                                <field name="country_phone_code" readonly="1" nolabel="1" 
+                                       style="width:40px; text-align:center;"/>
+                                <field name="phone" nolabel="1" placeholder="  Enter 9 digits" 
+                                       style="width:250px; margin-left:-2px;"/>
+                            </div>
+                        </group>
+
+                        <!-- Right Column: Professional Details -->
+                        <group string="Professional Details">
+                            <group colspan="2">
+                                <field name="trainer_specialty" 
+                                   placeholder="e.g. Computer Science, Mathematics, Engineering..."/>
+                                <field name="years_experience" 
+                                    placeholder="e.g., 5"/>
+                            </group>
+                            <!-- Address Section -->
+                            <group string="Address" colspan="2">
+                                <label for="street" string=""/>
+                                <div class="o_address_format">
+                                    <div class="o_row">
+                                        <field name="street" placeholder="Street..." class="o_address_street" style="width: 33%;"/>
+                                        <field name="street2" placeholder="Street 2..." class="o_address_street" style="width: 33%;"/>
+                                        <field name="city" placeholder="City" class="o_address_city" style="width: 33%;"/>
+                                    </div>
+                                    <div class="o_row">
+                                        <field name="zip" placeholder="ZIP" class="o_address_zip" style="width: 33%;"/>
+                                        <field name="state_id" placeholder="State" class="o_address_state" style="width: 33%;"
+                                            options="{'no_open': True, 'no_quick_create': True}"/>
+                                        <field name="country_id" placeholder="Country" class="o_address_country" style="width: 33%;"
+                                            options="{'no_open': True, 'no_create': True}" readonly="1"/>
+                                    </div>
+                                </div>
+                            </group>
+                        </group>
+
+
+                        
+                    </group>
+
+                    <!-- Tabs Section -->
+                    <notebook colspan="4">
+
+                        <!-- Tab 2: Professional Notes -->
+                        <page string="Professional Notes">
+                            <field name="professional_notes" 
+                                   placeholder="Add notes about trainer's expertise, teaching style, strengths, areas of focus, etc."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- ################################################################ -->
+    <!-- Trainer List View -->
+    <record id="trainer_jucct_list_view" model="ir.ui.view">
+        <field name="name">res.partner.list.trainer</field>
+        <field name="model">res.partner</field>
+        <field name="arch" type="xml">
+            <list string="Trainers">
+                <field name="name"/>
+                <field name="trainer_type"/>
+                <field name="trainer_academy_id"/>
+                <field name="email"/>
+                <field name="phone"/>
+                <field name="trainer_specialty"/>
+                <field name="active" optional="show"/> 
+            </list>
+        </field>
+    </record>
+
+    <!-- ################################################################ -->
+    <!-- Trainer Search View with Filters -->
+    <record id="trainer_jucct_search_view" model="ir.ui.view">
+        <field name="name">res.partner.search.trainer</field>
+        <field name="model">res.partner</field>
+        <field name="arch" type="xml">
+            <search string="Search Trainers">
+                <field name="name" string="Trainer Name"/>
+                <field name="email"/>
+                <field name="phone"/>
+                <field name="trainer_academy_id"/>
+                
+                <!-- Filters -->
+                <filter name="filter_trainers_only" string="Trainers" 
+                        domain="[('is_trainer', '=', True), ('active', 'in', [True, False])]"/>  
+                <filter name="filter_active" string="Active" 
+                        domain="[('active', '=', True)]"/> 
+                <filter name="filter_archived" string="Not Active" 
+                        domain="[('active', '=', False)]"/>  
+                <filter name="filter_center_trainer" string="Center Trainers" 
+                        domain="[('trainer_type', '=', 'center')]"/>
+                <filter name="filter_academy_trainer" string="Academy Trainers" 
+                        domain="[('trainer_type', '=', 'academy')]"/>
+                
+                 <!-- Group By -->
+                <group>
+                    <filter name="group_by_academy" string="Academy" 
+                            context="{'group_by': 'trainer_academy_id'}"/>
+                    <filter name="group_by_active" 
+                            string="Status" 
+                            context="{'group_by': 'active'}"/>
+
+                </group>
+            </search>
+        </field>
+    </record>
+
+</odoo>

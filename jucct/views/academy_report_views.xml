@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- Form View -->
+    <record id="view_academy_performance_report_form" model="ir.ui.view">
+        <field name="name">academy.performance.report.form</field>
+        <field name="model">academy.performance.report</field>
+        <field name="arch" type="xml">
+            <form create="false" edit="false" delete="false">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="academy_id" options='{"no_open": True}'/>
+                            <field name="program_id" string="Program" options='{"no_open": True}'/>
+                            <field name="program_type"/>
+                        </group>
+                        <group>
+                            <field name="responsible_user_id" string="Responsible User" options='{"no_open": True}'/>
+                            <field name="commission_rate" string="Commission Rate (%)"/>
+                            <field name="total_enrollments" string="Total Enrollments"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_academy_performance_report_list" model="ir.ui.view">
+        <field name="name">academy.performance.report.list</field>
+        <field name="model">academy.performance.report</field>
+        <field name="arch" type="xml">
+            <list string="Academy Performance Report" create="false" edit="false" delete="false"> 
+                <field name="academy_id" options='{"no_open": True}'/>
+                <field name="program_id" options='{"no_open": True}'/>
+                <field name="program_type"/> 
+                <field name="responsible_user_id" options='{"no_open": True}'/>
+                <field name="commission_rate" widget="float_toggle"/>
+                <field name="total_enrollments" sum="Total Enrollments"/>
+            </list>
+        </field>
+    </record>
+    
+    <record id="view_academy_performance_report_graph" model="ir.ui.view">
+        <field name="name">academy.performance.report.graph</field>
+        <field name="model">academy.performance.report</field>
+        <field name="arch" type="xml">
+            <graph string="Academy Performance Analysis" type="bar">
+                <field name="academy_id"/> 
+                <field name="program_type"/> 
+                <field name="program_id" type="row"/>
+                <field name="total_enrollments" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_academy_performance_report_pivot" model="ir.ui.view">
+        <field name="name">academy.performance.report.pivot</field>
+        <field name="model">academy.performance.report</field>
+        <field name="arch" type="xml">
+            <pivot string="Academy Performance Analysis (Pivot)">
+                <field name="academy_id" type="row"/>
+                <field name="program_type" type="row"/> 
+                <field name="program_id" type="row"/>
+                <field name="commission_rate" type="measure"/> 
+                <field name="total_enrollments" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_academy_performance_report_search" model="ir.ui.view">
+        <field name="name">academy.performance.report.search</field>
+        <field name="model">academy.performance.report</field>
+        <field name="arch" type="xml">
+            <search string="Academy Performance Analysis">
+                <field name="academy_id" filter_domain="[('academy_id','!=',False)]" string="Academy"/>
+                <field name="program_id" filter_domain="[('program_id','!=',False)]" string="Course"/>
+                <field name="responsible_user_id" string="Responsible User"/>
+
+                <separator/>
+                
+                <field name="program_type" string="Program Type"/> 
+                
+                <filter string="Courses Only" name="filter_courses" 
+                        domain="[('program_type', '=', 'course')]"/>
+                <filter string="Diplomas Only" name="filter_diplomas" 
+                        domain="[('program_type', '=', 'diploma')]"/>
+
+                <group>
+                    <filter string="Academy" name="group_by_academy" context="{'group_by':'academy_id'}"/>
+                    <filter string="Program Type" name="group_by_program_type" context="{'group_by':'program_type'}"/>
+                    <filter string="Program (All)" name="group_by_program_all" context="{'group_by':'program_id'}"/>
+                    <filter string="Responsible User" name="group_by_responsible" context="{'group_by':'responsible_user_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+</odoo>

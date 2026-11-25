@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Form View for Bulk Import Wizard -->
+        <record id="view_student_bulk_import_form" model="ir.ui.view">
+            <field name="name">student.bulk.import.form</field>
+            <field name="model">student.bulk.import</field>
+            <field name="arch" type="xml">
+                <form string="Bulk Import Students and Enrolments">
+                    <style>
+                        .o_form_button_save, .o_form_button_cancel {
+                            display: none !important;
+                        }
+                    </style>
+                    <header>
+                        <button name="action_import" type="object" 
+                                string="Import" 
+                                class="btn-primary" 
+                                invisible="state != 'draft' or not import_file"
+                                help="Start importing data from uploaded file"/>
+                        
+                        <button name="action_clear_results" type="object" 
+                                string="New Import" 
+                                invisible="state not in ['imported', 'error']"/>
+                        
+                        <field name="state" widget="statusbar" statusbar_visible="draft,imported,error"/>
+                    </header>
+                    
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <span invisible="state != 'draft'">Bulk Import Configuration</span>
+                                <span invisible="state == 'draft'">Import Results</span>
+                            </h1>
+                        </div>
+                        
+                        <!-- Import Configuration -->
+                        <group invisible="state != 'draft'">
+                            <group string="Import Settings">
+                                <field name="import_type" widget="radio" required="1"/>
+                                <div class="mt-3">
+                                    <button name="action_download_template" type="object" 
+                                            string="Download Template" 
+                                            class="btn btn-success"
+                                            icon="download"
+                                            help="Download CSV or Excel template with field descriptions"/>
+                                </div>
+                            </group>
+                            
+                            <group string="File Upload">
+                                <field name="file_name" invisible="1"/>
+                                <field name="import_file" filename="file_name"/>
+                            </group>
+                        </group>
+                        
+                        <!-- Instructions -->
+                        <div invisible="state != 'draft'">
+                            <group string="Import Instructions">
+                                <group string="Student Fields (Required)" invisible="import_type not in ['students', 'both']">
+                                    <div colspan="2">
+                                        <ul class="mb-0">
+                                            <li><strong>national_id:</strong> Exactly 10 digits</li>
+                                            <li><strong>name:</strong> Student full name</li>
+                                            <li><strong>email:</strong> Valid email address</li>
+                                            <li><strong>phone:</strong> Exactly 9 digits (without country code)</li>
+                                            <li><strong>date_of_birth:</strong> DD-MM-YYYY or YYYY-MM-DD</li>
+                                        </ul>
+                                    </div>
+                                </group>
+                                
+                                <group string="Student Fields (Optional)" invisible="import_type not in ['students', 'both']">
+                                    <div colspan="2">
+                                        <ul class="mb-0">
+                                            <li><strong>Student_id:</strong> Leave empty for auto-generation</li>
+                                            <li><strong>country_code:</strong> 2-letter code like JO (default: JO)</li>
+                                        </ul>
+                                    </div>
+                                </group>
+                                
+                                <group string="Enrolment Fields (Required)" invisible="import_type != 'both'">
+                                    <div colspan="2">
+                                        <ul class="mb-0">
+                                            <li><strong>class_offering_code:</strong> Required - Class offering code</li>
+                                            <li><strong>year:</strong> Required for diploma programs only</li>
+                                            <li><strong>semester:</strong> Required for diploma (first/second/summer)</li>
+                                        </ul>
+                                    </div>
+                                </group>
+                                
+                                <group string="Important Notes">
+                                    <div colspan="2">
+                                        <div class="alert alert-warning mb-0" role="alert">
+                                            <ul class="mb-0">
+                                                <li><strong>Strict Validation:</strong> All rows must be error-free before any import</li>
+                                                <li><strong>No Partial Import:</strong> Either all records import successfully or none</li>
+                                                <li><strong>Duplicate Check:</strong> No duplicate national_id in the same file</li>
+                                                <li><strong>Existing Students:</strong> Will be updated automatically</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </group>
+                            </group>
+                        </div>
+                        
+                        <!-- Results -->
+                        <div invisible="state == 'draft'">
+                            <group string="Import Results">
+                                <group string="Statistics">
+                                    <field name="total_rows"/>
+                                    <field name="imported_students"/>
+                                    <field name="imported_enrolments"/>
+                                    <field name="skipped_enrolments"/>
+                                    <field name="error_count"/>
+                                </group>
+                                
+                                <group string="Error Log" invisible="error_count == 0">
+                                    <field name="error_log" widget="text" readonly="1" nolabel="1"/>
+                                </group>
+                                
+                                <div class="alert alert-success" role="alert" invisible="error_count != 0">
+                                    <strong>Success!</strong> All records imported successfully.
+                                </div>
+                                
+                                <div class="alert alert-danger" role="alert" invisible="error_count == 0">
+                                    <strong>Import Failed!</strong> No records were imported due to validation errors.
+                                </div>
+                            </group>
+                        </div>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        
+        <!-- Form View for Template Download Wizard -->
+        <record id="view_template_download_wizard_form" model="ir.ui.view">
+            <field name="name">template.download.wizard.form</field>
+            <field name="model">template.download.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Download Template">
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>Download Import Template</h1>
+                        </div>
+                        
+                        <group>
+                            <group string="Template Options">
+                                <field name="file_format" widget="radio" required="1"/>
+                                <field name="import_type" invisible="1"/>
+                                <field name="columns" invisible="1"/>
+                                <field name="is_arabic" invisible="1"/>
+                            </group>
+                            
+                            <group string="Template Information">
+                                <div>
+                                    <p><strong>File Format Options:</strong></p>
+                                    <ul class="mb-0">
+                                        <li><strong>Excel (.xlsx):</strong> Recommended - Supports formatting, multiple sheets, and Arabic text</li>
+                                        <li><strong>CSV (.csv):</strong> Simple format - Works with all spreadsheet programs</li>
+                                    </ul>
+                                </div>
+                            </group>
+                        </group>
+                        
+                        <footer>
+                            <button name="action_download" type="object" 
+                                    string="Download Template" 
+                                    class="btn-primary"
+                                    icon="download"/>
+                            <button string="Cancel" 
+                                    special="cancel" 
+                                    class="btn-secondary"/>
+                        </footer>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        
+        <!-- Action for Template Download Wizard -->
+        <record id="action_template_download_wizard" model="ir.actions.act_window">
+            <field name="name">Download Template</field>
+            <field name="res_model">template.download.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+            <field name="context">{'create': False, 'delete': False}</field>
+        </record>
+        
+        <!-- Action to open the wizard -->
+        <record id="action_student_bulk_import" model="ir.actions.act_window">
+            <field name="name">Bulk Import Students</field>
+            <field name="res_model">student.bulk.import</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+
+        <!-- Custom Form View for Enrolment Lines -->
+        <record id="view_enrollment_line_form_simple" model="ir.ui.view">
+            <field name="name">sale.order.line.form.simple.enrollment</field>
+            <field name="model">sale.order.line</field>
+            <field name="priority">1</field>
+            <field name="arch" type="xml">
+                <form string="Enrollment Details" create="false" edit="false" delete="false">
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="program_id" readonly="1" options="{'no_open': True}"/>
+                            </h1>
+                        </div>
+                        
+                        <group>
+                            <group string="Enrollment Details">
+                                <field name="academy_id" readonly="1" options="{'no_open': True}"/>
+                                <field name="class_offering_id" readonly="1" options="{'no_open': True}"/>
+                                <field name="order_id" string="Enrollment Order" readonly="1" options="{'no_open': True}"/>
+                            </group>
+                            
+                            <group string="Academic Info">
+                                <field name="year" readonly="1"/>
+                                <field name="semester" readonly="1"/>
+                                <field name="price_unit" readonly="1" string="Price"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+    </data>
+</odoo>

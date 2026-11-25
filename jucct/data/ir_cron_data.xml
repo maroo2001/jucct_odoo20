@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Cron Job to Update Academy Contract Status -->
+    <record id="ir_cron_update_academy_contract_status" model="ir.cron">
+        <field name="name">Update Academy Contract Status</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="state">code</field>
+        <field name="code">model.cron_update_contract_status()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="active" eval="True"/>
+    </record>
+</odoo>

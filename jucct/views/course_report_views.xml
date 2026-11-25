@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="educational_course_report_list" model="ir.ui.view">
+        <field name="name">educational.course.report.list</field>
+        <field name="model">educational.course.report</field>
+        <field name="arch" type="xml">
+            <list string="Course Reports" create="false" edit="false" delete="false">
+                <field name="program_id" string="Course/Diploma" options='{"no_open": True}'/> 
+                <field name="program_type"/>
+                <field name="academy_id" string="Academy / Center" options='{"no_open": True}'/>
+                <field name="enrolment_count" string="Confirmed Enrollments" sum="Total Confirmed"/>
+                <field name="price" string="Program Price" sum="Total Price"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="educational_course_report_form" model="ir.ui.view">
+        <field name="name">educational.course.report.form</field>
+        <field name="model">educational.course.report</field>
+        <field name="arch" type="xml">
+            <form create="false" edit="false" delete="false">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="program_id" string="Program/Course" options='{"no_open": True}'/>
+                            <field name="program_type"/>
+                            <field name="program_status"/>
+                            <field name="enrolment_count" string="Total Enrollments"/>
+                        </group>
+                        <group>
+                            <field name="program_name"/>
+                            <field name="academy_id" options='{"no_open": True}'/>
+                            <field name="location"/>
+                            <field name="price" string="Program Price"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="educational_course_report_pivot" model="ir.ui.view">
+        <field name="name">educational.course.report.pivot</field>
+        <field name="model">educational.course.report</field>
+        <field name="arch" type="xml">
+            <pivot string="Course Analysis (Pivot)">
+                <field name="academy_id" type="row"/>
+                <field name="enrolment_count" type="measure"/>
+                <field name="price" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="educational_course_report_graph" model="ir.ui.view">
+        <field name="name">educational.course.report.graph</field>
+        <field name="model">educational.course.report</field>
+        <field name="arch" type="xml">
+            <graph string="Course Analysis (Graph)" type="bar">
+                <field name="program_type" type="row"/>
+                <field name="program_id" type="row"/>
+                <field name="enrolment_count" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="educational_course_report_search" model="ir.ui.view">
+        <field name="name">educational.course.report.search</field>
+        <field name="model">educational.course.report</field>
+        <field name="arch" type="xml">
+            <search string="Course Analysis">
+                <field name="program_id"/>
+                <field name="academy_id"/>
+                <field name="program_type"/>
+                <field name="program_status"/>
+                <field name="location"/>
+
+                <separator string="Filters"/>
+                <filter name="filter_course_type" string="Courses"
+                        domain="[('program_type', '=', 'course')]"/>
+                <filter name="filter_diploma_type" string="Diplomas"
+                        domain="[('program_type', '=', 'diploma')]"/>
+
+                <group>
+                    <filter name="group_type" string="Program Type"
+                            context="{'group_by':'program_type'}"/>
+                    <filter name="group_course" string="Programs"
+                            context="{'group_by':'program_id'}"/>
+                    <filter name="group_academy" string="Academy"
+                            context="{'group_by':'academy_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+</odoo>

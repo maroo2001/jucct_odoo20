@@ -1,0 +1,84 @@
+<odoo>
+    <record id="email_template_enrollment_invoice" model="mail.template">
+        <field name="name">Enrollment Invoice: Sending</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="email_from">{{ (object.invoice_user_id.email_formatted or object.company_id.email_formatted or user.email_formatted) }}</field>
+        <field name="partner_to">{{ object.partner_id.id }}</field>
+        <field name="subject">{{ object.company_id.name }} Enrollment Invoice (Ref {{ object.name or 'n/a' }})</field>
+        <field name="description">Sent to students with their enrollment invoice attached.</field>
+        <field name="lang">{{ object.partner_id.lang }}</field>
+        <field name="auto_delete" eval="True"/>
+        <field name="body_html" type="html">
+<table border="0" cellpadding="0" cellspacing="0" style="padding-top: 16px; background-color: #FFFFFF; font-family:Verdana, Arial,sans-serif; color: #333; width: 100%; border-collapse:separate;">
+    <tr>
+        <td align="center">
+            <table border="0" cellpadding="0" cellspacing="0" width="600" style="background-color: #fff; padding: 16px;">
+                <tr>
+                    <td style="font-size: 13px;">
+                        <p>Dear <strong t-out="object.partner_id.name or ''">Student</strong>,</p>
+                        <p>
+                            We are pleased to share your <strong>Enrollment Invoice</strong> <strong t-out="object.name or ''"/>.
+                        </p>
+                        <t t-if="object.invoice_origin">
+                            <p>
+                                (Registration Ref: <t t-out="object.invoice_origin or ''"/>)
+                            </p>
+                        </t>
+                        <p>
+                            Amounting to <strong t-out="format_amount(object.amount_total, object.currency_id) or ''"/> from <t t-out="object.company_id.name or ''"/>.
+                        </p>
+                        <t t-if="object.partner_id.university_id">
+                            <p>
+                                <strong>Student ID:</strong> <t t-out="object.partner_id.university_id"/>
+                            </p>
+                        </t>
+                        <br/>
+                        <t t-if="object.payment_state in ('paid', 'in_payment')">
+                            <p>
+                                This invoice has been <strong>paid</strong>. Thank you for your prompt payment.
+                            </p>
+                        </t>
+                        <t t-else="">
+                            <p>
+                                Please complete the payment at your earliest convenience.
+                            </p>
+                            <t t-if="object.payment_reference">
+                                <p>
+                                    Kindly use the following reference when making your payment: <strong t-out="object.payment_reference or ''"/>.
+                                </p>
+                                <t t-if="object.partner_bank_id">
+                                    <p>
+                                        Payment can be made to: <strong t-out="object.partner_bank_id.acc_number"/>.
+                                    </p>
+                                </t>
+                            </t>
+                        </t>
+                        <br/>
+                        <p>
+                            For any questions about your enrollment or payment, please contact us at
+                            <a t-att-href="'mailto:%s' % (object.company_id.email or user.email or 'info@example.com')">
+                                <t t-out="object.company_id.email or user.email or 'info@example.com'"/>
+                            </a>.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+        </field>
+    </record>
+      <record id="mt_enrolment_confirmed" model="mail.message.subtype">
+    <field name="name">Enrolment confirmed</field>
+    <field name="res_model">sale.order</field>
+    <field name="default" eval="False"/>
+    <field name="description">Enrolment confirmed</field>
+  </record>
+
+  <record id="mt_enrolment_created" model="mail.message.subtype">
+    <field name="name">Enrolment created</field>
+    <field name="res_model">sale.order</field>
+    <field name="default" eval="False"/>
+    <field name="description">Enrolment record created</field>
+  </record>
+</odoo>

@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+
+        <!-- Audit Log Rule for Academy Program Offering -->
+        <record id="rule_audit_academy_program_offering" model="auditlog.rule">
+            <field name="name">Academy Program Offering Audit Rule</field>
+            <field name="model_id" ref="jucct.model_academy_program_offering"/>
+            <field name="log_read">True</field>
+            <field name="log_write">True</field>
+            <field name="log_create">True</field>
+            <field name="log_unlink">True</field>
+            <field name="state">subscribed</field>
+        </record>
+
+        <!-- Audit Log Rule for Academy Financial Settlement -->
+        <record id="rule_audit_academy_financial_settlement" model="auditlog.rule">
+            <field name="name">Academy Financial Settlement Audit Rule</field>
+            <field name="model_id" ref="jucct.model_academy_financial_settlement"/>
+            <field name="log_read">True</field>
+            <field name="log_write">True</field>
+            <field name="log_create">True</field>
+            <field name="log_unlink">True</field>
+            <field name="state">subscribed</field>
+        </record>
+
+
+                <!-- Audit Log Rule for Academy Contract -->
+            <record id="rule_audit_academy_contract" model="auditlog.rule">
+            <field name="name">Academy Contract Audit Rule</field>
+            <field name="model_id" ref="jucct.model_academy_contract"/>
+            <field name="log_read">True</field>
+            <field name="log_write">True</field>
+            <field name="log_create">True</field>
+            <field name="log_unlink">True</field>
+            <field name="state">subscribed</field>
+        </record>
+
+
+        <!-- Audit Log Rule for Academy Session -->
+        <record id="rule_audit_academy_session" model="auditlog.rule">
+            <field name="name">Academy Session Audit Rule</field>
+            <field name="model_id" ref="jucct.model_academy_session"/>
+            <field name="log_read">True</field>
+            <field name="log_write">True</field>
+            <field name="log_create">True</field>
+            <field name="log_unlink">True</field>
+            <field name="state">subscribed</field>
+        </record>
+
+        <!-- Audit Log Rule for Trainer Certification -->
+       <record id="rule_audit_trainer_certification" model="auditlog.rule">
+             <field name="name">Trainer Certification Audit Rule</field>
+            <field name="model_id" ref ="model_trainer_certification"/>
+            <field name="log_read">True</field>
+            <field name="log_write">True</field>
+            <field name="log_create">True</field>
+            <field name="log_unlink">True</field>
+            <field name="state">subscribed</field>
+        </record>
+
+        <!--  -->
+
+        <!-- Audit Log Rule for Session Day -->
+        <record id="rule_audit_session_day" model="auditlog.rule">
+            <field name="name">Session Day Audit Rule</field>
+            <field name="model_id" ref="jucct.model_session_day"/>
+            <field name="log_read">True</field>
+            <field name="log_write">True</field>
+            <field name="log_create">True</field>
+            <field name="log_unlink">True</field>
+            <field name="state">subscribed</field>
+        </record>
+
+        <!-- Audit Log Rule for Academy Performance Report (SQL view) -->
+        <record id="rule_audit_academy_performance_report" model="auditlog.rule">
+            <field name="name">Academy Performance Report Audit Rule</field>
+            <field name="model_id" ref="jucct.model_academy_performance_report"/>
+            <field name="log_read">True</field>
+            <field name="log_write">False</field>
+            <field name="log_create">False</field>
+            <field name="log_unlink">False</field>
+            <field name="state">subscribed</field>
+        </record>
+
+        <!-- Audit Log Rule for Academy Student Payment -->
+        <record id="rule_audit_academy_student_payment" model="auditlog.rule">
+            <field name="name">Academy Student Payment Audit Rule</field>
+            <field name="model_id" ref="jucct.model_academy_student_payment"/>
+            <field name="log_read">True</field>
+            <field name="log_write">True</field>
+            <field name="log_create">True</field>
+            <field name="log_unlink">True</field>
+            <field name="state">subscribed</field>
+        </record>
+
+        <!-- Audit Log Rule for Account Move (inherited) -->
+        <record id="rule_audit_account_move" model="auditlog.rule">
+            <field name="name">Account Move Audit Rule</field>
+            <field name="model_id" ref="jucct.model_account_move"/>
+            <field name="log_read">True</field>
+            <field name="log_write">True</field>
+            <field name="log_create">True</field>
+            <field name="log_unlink">True</field>
+            <field name="state">subscribed</field>
+        </record>
+
+        <!-- Audit Log Rule for Educational Course Report (SQL view) -->
+        <record id="rule_audit_educational_course_report" model="auditlog.rule">
+            <field name="name">Educational Course Report Audit Rule</field>
+            <field name="model_id" ref="jucct.model_educational_course_report"/>
+            <field name="log_read">True</field>
+            <field name="log_write">False</field>
+            <field name="log_create">False</field>
+            <field name="log_unlink">False</field>
+            <field name="state">subscribed</field>
+        </record>
+
+        <!-- Audit Log Rule for Educational Dashboard (abstract model) -->
+        <record id="rule_audit_educational_dashboard" model="auditlog.rule">
+            <field name="name">Educational Dashboard Audit Rule</field>
+            <field name="model_id" ref="jucct.model_educational_dashboard"/>
+            <field name="log_read">True</field>
+            <field name="log_write">False</field>
+            <field name="log_create">False</field>
+            <field name="log_unlink">False</field>
+            <field name="state">subscribed</field>
+        </record>
+
+        <!-- Audit Log Rule for Educational Enrollment Report (SQL view) -->
+        <record id="rule_audit_educational_enrollment_report" model="auditlog.rule">
+            <field name="name">Educational Enrollment Report Audit Rule</field>
+            <field name="model_id" ref="jucct.model_educational_enrollment_report"/>
+            <field name="log_read">True</field>
+            <field name="log_write">False</field>
+            <field name="log_create">False</field>
+            <field name="log_unlink">False</field>
+            <field name="state">subscribed</field>
+        </record>
+
+        <!-- Audit Log Rule for Product Template (inherited) -->
+        <record id="rule_audit_product_template" model="auditlog.rule">
+            <field name="name">Product Template Audit Rule</field>
+            <field name="model_id" ref="jucct.model_product_template"/>
+            <field name="log_read">True</field>
+            <field name="log_write">True</field>
+            <field name="log_create">True</field>
+            <field name="log_unlink">True</field>
+            <field name="state">subscribed</field>
+        </record>
+
+        <!-- Audit Log Rule for Educational Approval -->
+        <record id="rule_audit_educational_approval" model="auditlog.rule">
+            <field name="name">Educational Approval Audit Rule</field>
+            <field name="model_id" ref="jucct.model_educational_approval"/>
+            <field name="log_read">True</field>
+            <field name="log_write">True</field>
+            <field name="log_create">True</field>
+            <field name="log_unlink">True</field>
+            <field name="state">subscribed</field>
+        </record>
+
+        <!-- Audit Log Rule for Educational Student Report (SQL view) -->
+        <record id="rule_audit_educational_student_report" model="auditlog.rule">
+            <field name="name">Educational Student Report Audit Rule</field>
+            <field name="model_id" ref="jucct.model_educational_student_report"/>
+            <field name="log_read">True</field>
+            <field name="log_write">False</field>
+            <field name="log_create">False</field>
+            <field name="log_unlink">False</field>
+            <field name="state">subscribed</field>
+        </record>
+
+
+        <!-- Audit Log Rule for Edu User -->
+        <record id="rule_audit_edu_user" model="auditlog.rule">
+            <field name="name">Edu User Audit Rule</field>
+            <field name="model_id" ref="jucct.model_edu_user"/>
+            <field name="log_read">True</field>
+            <field name="log_write">True</field>
+            <field name="log_create">True</field>
+            <field name="log_unlink">True</field>
+            <field name="state">subscribed</field>
+        </record>
+
+        <!-- Audit Log Rule for Withdrawal Fine Wizard (transient) -->
+        <record id="rule_audit_withdrawal_fine_wizard" model="auditlog.rule">
+            <field name="name">Withdrawal Fine Wizard Audit Rule</field>
+            <field name="model_id" ref="jucct.model_withdrawal_fine_wizard"/>
+            <field name="log_read">True</field>
+            <field name="log_write">True</field>
+            <field name="log_create">True</field>
+            <field name="log_unlink">True</field>
+            <field name="state">subscribed</field>
+        </record>
+
+        <!-- Audit Log Rule for Sale Order Popup Wizard (transient) -->
+        <record id="rule_audit_sale_order_popup_wizard" model="auditlog.rule">
+            <field name="name">Sale Order Popup Wizard Audit Rule</field>
+            <field name="model_id" ref="jucct.model_sale_order_popup_wizard"/>
+            <field name="log_read">True</field>
+            <field name="log_write">True</field>
+            <field name="log_create">True</field>
+            <field name="log_unlink">True</field>
+            <field name="state">subscribed</field>
+        </record>
+
+        <!-- Audit Log Rule for Sale Order (inherited) -->
+        <record id="rule_audit_sale_order" model="auditlog.rule">
+            <field name="name">Sale Order Audit Rule</field>
+            <field name="model_id" ref="jucct.model_sale_order"/>
+            <field name="log_read">True</field>
+            <field name="log_write">True</field>
+            <field name="log_create">True</field>
+            <field name="log_unlink">True</field>
+            <field name="state">subscribed</field>
+        </record>
+
+        <!-- Audit Log Rule for Sale Order Line (inherited) -->
+        <record id="rule_audit_sale_order_line" model="auditlog.rule">
+            <field name="name">Sale Order Line Audit Rule</field>
+            <field name="model_id" ref="jucct.model_sale_order_line"/>
+            <field name="log_read">True</field>
+            <field name="log_write">True</field>
+            <field name="log_create">True</field>
+            <field name="log_unlink">True</field>
+            <field name="state">subscribed</field>
+        </record>
+
+        <!-- Audit Log Rule for Account Move Line (inherited) -->
+        <record id="rule_audit_account_move_line" model="auditlog.rule">
+            <field name="name">Account Move Line Audit Rule</field>
+            <field name="model_id" ref="jucct.model_account_move_line"/>
+            <field name="log_read">True</field>
+            <field name="log_write">True</field>
+            <field name="log_create">True</field>
+            <field name="log_unlink">True</field>
+            <field name="state">subscribed</field>
+        </record>
+
+    </data>
+</odoo>

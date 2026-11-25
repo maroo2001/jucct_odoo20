@@ -1,0 +1,222 @@
+<odoo>
+<template id="report_invoice_document_jucct">
+        <t t-call="web.html_container">
+        <t t-foreach="docs" t-as="o">
+        <t t-call="jucct.external_layout_standard_invoice_jucct">
+        <t t-set="is_arabic" t-value="request.env.lang and request.env.lang.startswith('ar')"/>
+            <main class="page" t-attf-style="direction: #{'rtl' if is_arabic else 'ltr'}; text-align: #{'right' if is_arabic else 'left'}; font-family: 'Cairo','Noto Naskh Arabic',sans-serif;">
+                <!-- University Header -->
+                <div class="text-center mb-4">
+                    <h2 class="mt-2"><t t-translate="true">ENROLLMENT INVOICE </t></h2>
+                </div>
+                <!-- Student Info Section -->
+                <div class="row mb-3" style="font-size:13px;">
+                    <div class="col-6">
+                        <p><strong><t t-translate="true">Student Name:</t></strong> <t t-out="o.partner_id.name"/></p>
+                        <p><strong><t t-translate="true">Student ID:</t></strong> <t t-out="o.university_id or ''"/></p>
+                    </div>
+                    <div class="col-6">
+                        <p><strong><t t-translate="true">Invoice #:</t></strong> <t t-out="o.name"/></p>
+                        <p><strong><t t-translate="true">Invoice Date:</t></strong> <t t-out="o.invoice_date and o.invoice_date.strftime('%d %B %Y') or ''"/></p>
+                        <p><strong><t t-translate="true">Payment Date:</t></strong> <t t-out="o.invoice_payment_term_id.name if o.invoice_payment_term_id else ''"/></p>
+                    </div>
+                </div>
+
+                <hr style="border:1px solid #000;"/>
+
+                <!-- Course / Offering Details -->
+                <table class="table table-sm table-bordered mt-3" style="font-size:13px;">
+                    <thead t-attf-style="background-color:#f2f2f2;">
+                        <tr>
+                            <th t-attf-style=" text-align: #{'left' if not is_arabic else 'right'}; direction: #{'rtl' if is_arabic else 'ltr'}; unicode-bidi:embed;"><t t-translate="true">Program:</t></th>
+                            <th t-attf-style=" text-align: #{'left' if not is_arabic else 'right'}; direction: #{'rtl' if is_arabic else 'ltr'}; unicode-bidi:embed;"><t t-translate="true">academy:</t></th>
+                            <th t-attf-style=" text-align: #{'left' if not is_arabic else 'right'}; direction: #{'rtl' if is_arabic else 'ltr'}; unicode-bidi:embed;"><t t-translate="true">Offering</t></th>
+                            <th t-attf-style=" text-align: #{'left' if not is_arabic else 'right'}; direction: #{'rtl' if is_arabic else 'ltr'}; unicode-bidi:embed;"><t t-translate="true">Tuition Fee</t></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                   <t t-foreach="o.invoice_line_ids.filtered(lambda l: o.is_enrollment)" t-as="line">
+                                <tr>
+                                <td t-attf-style="direction: #{'rtl' if is_arabic else 'ltr'}; unicode-bidi:embed;"><t t-out="line.product_id.name or ''"/></td>
+                                <td t-attf-style="direction: #{'rtl' if is_arabic else 'ltr'}; unicode-bidi:embed;"><t t-out="line.academy_id.name or ''"/></td>
+                                <td style="direction:ltr; unicode-bidi:embed;"><t t-out="(line.class_offering_id.display_name or line.name)"/></td>
+                                <td t-attf-style="direction: #{'rtl' if is_arabic else 'ltr'}; unicode-bidi:embed;">
+                                    <t t-out="'%0.2f' % line.price_subtotal"/> <t t-out="o.currency_id.symbol"/>
+                                </td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+
+               <div class="row mt-4" style="font-size:13px;">
+
+                <!-- Left column: Payment Terms / Notes -->
+                <div class="col-7" id="payment_term">
+                    
+                    <t t-if="o.is_withdraw == 0">
+                    <!-- Payment Plan Details -->
+                    <t t-if="o.show_payment_plan and o.payment_plan_details">
+                        <div class="mb-3">
+                            <h5><t t-translate="true">Payment Plan</t></h5>
+                            <div t-out="o.payment_plan_details"/>
+                        </div>
+                    </t>
+                    </t>
+                    <t t-if="o.is_withdraw">
+                        <div class="alert alert-light text-start mt-3" style="font-size:13px;">
+                            <p><strong><t t-translate="true">Status:</t></strong><t t-translate="true"> Withdrawn</t></p>
+                            <p><strong><t t-translate="true">Withdrawal Fine:</t></strong> <t t-out="o.withdrawal_fine"/> </p>
+                        <t t-set="payments_vals" t-value="o.sudo().invoice_payments_widget and o.sudo().invoice_payments_widget['content'] or []"/>
+                        <t t-if="payments_vals">
+                            <t t-set="last_payment" t-value="sorted(payments_vals, key=lambda p: p['date'])[-1] if payments_vals else None"/>
+                            <p>
+                                <strong><t t-translate="true">Withdrawal Date:</t></strong>
+                                <t t-out="last_payment['date']" t-options="{'widget': 'date'}"/>
+                            </p>
+                        </t>
+                            <p><em><t t-translate="true">No additional payments are required.</t></em></p>
+                        </div>
+                    </t>
+                </div>
+
+                <!-- Right column: Totals -->
+                <div t-attf-class=" col-5 o_inner_group grid oe_subtotal_footer"
+     t-attf-style="font-size:14px; text-align: #{'left' if is_arabic else 'right'};">
+                    <p><strong><t t-translate="true">Total Tuition:</t></strong>
+                        <span><t t-out="'%0.2f' % o.amount_total"/> <t t-out="o.currency_id.symbol"/></span>
+                    </p>
+
+                    <p><strong><t t-translate="true">Payments made:</t></strong></p>
+                    <t t-if="o.payment_state != 'invoicing_legacy'">
+                        <t t-set="payments_vals" t-value="o.sudo().invoice_payments_widget and o.sudo().invoice_payments_widget['content'] or []"/>
+                        <t t-foreach="payments_vals" t-as="payment_vals">
+                            <t t-if="payment_vals['is_exchange'] == 0">
+                                <div style="margin: 0; line-height: 1.2;">
+                                    <i class="oe_form_field oe_payment_label">
+                                         <t t-out="payment_vals['amount']" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                                        <t t-translate="true">Paid on</t> <t t-out="payment_vals['date']" t-options="{'widget': 'date'}"/>
+                                    </i>
+                                </div>
+                            </t>
+                        </t>
+                    </t>
+                    <hr style="margin: 8px 0; border-top: 1px solid #ccc;"/>
+                    <t t-if="o.is_withdraw == 0">
+                    <p><strong><t t-translate="true">Amount Due:</t></strong>
+                        <span><t t-out="'%0.2f' % o.amount_due_with"/> <t t-out="o.currency_id.symbol"/></span>
+                    </p>
+                    </t>
+                </div>
+
+            </div>
+                <!-- Footer -->
+                <div class="mt-5">
+                    <p><t t-out="o.narration or ''"/></p>
+                </div>
+            </main>
+            </t>
+        </t>
+        </t>
+      
+</template>
+<template id="external_layout_standard_invoice_jucct" >
+        <t t-set="company" t-value="res_company or (doc and doc.company_id) or (docs and docs[0].company_id)"/>
+        <div t-attf-class="header o_company_#{company.id}_layout">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <img t-if="company.logo" class="o_company_logo_small" t-att-src="image_data_uri(company.logo)" alt="Logo"/>
+                <div t-if="company.report_header" t-field="company.report_header" class="o_company_tagline mw-50 fw-bold">Company tagline</div>
+            </div>
+            <div class="row">
+                <div class="col-6" name="company_address">
+                    <ul class="list-unstyled" name="company_address_list">
+                        <li t-if="company.is_company_details_empty"><span t-field="company.partner_id" t-options='{"widget": "contact", "fields": ["address", "name"], "no_marker": true}'>
+                            <div class="bg-light border-1 rounded h-100 d-flex flex-column align-items-center justify-content-center p-4 w-100 opacity-75 text-muted text-center">
+                                <strong>Company address block</strong>
+                                <div>Contains the company address.</div>
+                            </div>
+                        </span></li>
+                        <li t-else="">
+                            <span t-field="company.company_details" class="text-nowrap">
+                                <div class="bg-light border-1 rounded h-100 d-flex flex-column align-items-center justify-content-center p-4 w-100 opacity-75 text-muted text-center">
+                                    <strong>Company details block</strong>
+                                    <div>Contains the company details.</div>
+                                </div>
+                            </span>
+                        </li>
+                        <li t-if="not forced_vat"/>
+                        <li t-else="">
+                            <t t-out="company.country_id.vat_label or 'Tax ID'">Tax ID</t>:
+                            <span t-out="forced_vat">US12345671</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <!-- Odoo 20: company.layout_background / layout_background_image were removed, so no background image here -->
+        <div t-attf-class="article o_report_layout_standard o_table_standard o_company_#{company.id}_layout o_snail_mail"
+             t-att-data-oe-model="o and o._name"
+             t-att-data-oe-id="o and o.id"
+             t-att-data-oe-lang="o and o.env.context.get('lang')">
+            <t t-call="web.address_layout"/>
+            <h2 t-out="layout_document_title"/>
+            <t t-out="0"/>
+        </div>
+
+        <div t-attf-class="footer o_company_#{company.id}_layout {{ report_type != 'pdf' and 'mt-auto' }}">
+            <div class="o_footer_content d-flex justify-content-between align-items-start border-top pt-2" style="font-size:11px;">
+                
+                <!-- Left: Company Footer Text -->
+                <div class="flex-grow-1 text-start text-muted">
+                <span><t t-translate="true">Created by </t><t t-out="o.create_uid.name if o.create_uid else 'System'"/><br/></span>
+                    <span><t t-translate="true">Created on </t><t t-out="o.create_date and o.create_date.strftime('%d %B %Y, %H:%M') or ''"/><br/></span>
+                    <span><t t-out="o.company_id.name"/></span>
+                </div>
+                <!-- Right: Page & Document Info -->
+                <div class="text-end text-muted">
+                    <t t-if="report_type == 'pdf' and display_name_in_footer">
+                        <div t-out="o.name"/>
+                    </t>
+                    <t t-if="report_type == 'pdf'">
+                        <div class="text-nowrap"><t t-translate="true">Page</t> <span class="page"/> / <span class="topage"/></div>
+                    </t>
+                </div>
+            </div>
+        </div>
+    </template>
+    <template id="report_payment_receipt_document_inherit" inherit_id="account.report_payment_receipt_document">
+        
+        <!-- Replace the Customer / Vendor label -->
+        <div class="col-6" t-if="o.partner_type" position="replace">
+            <div class="col-6" t-if="o.partner_type">
+            <t t-if="o.partner_type == 'customer' and o.partner_id.edu_type == 'student'">
+                <t t-translate="true">Student:</t>
+            </t>
+            <t t-elif="o.partner_type == 'customer'">
+                Customer:
+            </t>
+            <t t-elif="o.partner_type == 'supplier'">
+                Vendor:
+            </t><span t-field="o.partner_id" data-oe-demo="Marc Demo"/>
+            </div>
+        </div>
+        <div class="mb-4 mt-3" position="inside">
+        <div class="row">
+            <div class="col-6" t-if="o.partner_type">
+            <t t-if="o.partner_type == 'customer' and o.partner_id.edu_type == 'student'">
+               <t t-translate="true"> Student ID:</t>
+            </t><span t-field="o.partner_id.university_id" data-oe-demo="Marc Demo"/>
+            </div>
+            </div>
+            </div>
+
+    </template>
+<record id="enrollment_invoice_report" model="ir.actions.report">
+<field name="name">Enrollment Invoice PDF</field>
+<field name="model">account.move</field>
+<field name="report_type">qweb-pdf</field>
+<field name="report_name">jucct.report_invoice_document_jucct</field>
+<field name="is_invoice_report">True</field>
+<field name="print_report_name">(object._get_report_base_filename())</field>
+<field name="attachment"/>
+</record>
+</odoo>

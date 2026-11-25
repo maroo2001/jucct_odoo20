@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+  <!-- ========================= -->
+  <!-- Tree / List View -->
+  <!-- ========================= -->
+  <record id="view_edu_user_tree" model="ir.ui.view">
+    <field name="name">edu.user.list</field>
+    <field name="model">edu.user</field>
+    <field name="arch" type="xml">
+      <list>
+        <field name="name"/>
+        <field name="login"/>
+        <field name="email"/>
+        <field name="active"/>
+      </list>
+    </field>
+  </record>
+
+  <!-- ========================= -->
+  <!-- Form View -->
+  <!-- ========================= -->
+  <record id="view_edu_user_form" model="ir.ui.view">
+    <field name="name">edu.user.form</field>
+    <field name="model">edu.user</field>
+    <field name="arch" type="xml">
+      <form string="Education User" create="true" edit="true">
+                <header>   
+         <button name="action_send_reset_email"
+         string="Send Password Reset Email"
+          type="object"
+           class="btn-primary"/> </header>
+        <sheet>
+
+          <!-- Title -->
+          <div class="oe_title">
+            <label for="name"/>
+            <h1>
+              <field name="name" placeholder="User Name"/>
+            </h1>
+          </div>
+
+          <!-- Basic Info -->
+          <group>
+            <group>
+              <field name="login" placeholder="Login / Username"/>
+              <field name="email"/>
+              <field name="active"/>
+            </group>
+            <group>
+              <field name="password" password="True" placeholder="Set password..."/>
+              <field name="user_id" invisible="1"/>
+            </group>
+          </group>
+
+          <!-- Notebook / Tabs -->
+          <notebook>
+
+            <!-- Access Rights Tab -->
+            <page string="Access Rights" name="access_rights">
+              <group>
+
+                <!-- Student / Enrolment Access -->
+                <group string="Student / Enrolment Access">
+                <group>
+                  <field name="students_enrolment" widget="radio" nolabel="1"/>
+                  </group>
+                  <group>
+                  <field name="students_enrolment_own_records" invisible="students_enrolment != 'group_student_enrolment_rw'" widget="radio" nolabel="1"/>
+                </group>
+                </group>
+
+                <!-- Academies / Trainers Access -->
+                <group string="Academies / Trainers Access">
+                  <field name="academy_trainer" widget="radio" nolabel="1"/>
+                </group>
+
+                <!-- Programs / Offerings Access -->
+                <group string="Programs / Offerings Access">
+                  <field name="course_offering" widget="radio" nolabel="1"/>
+                </group>
+
+                <!-- Financial / Analytics Access -->
+                <group string="Financial Access">
+                  <field name="financial_analytics" widget="radio" nolabel="1"/>
+                </group>
+                  <group string="Dashboard Access">
+                  <field name="dashboard_analytics" widget="radio" nolabel="1"/>
+                </group>
+                <group string="Reports Access">
+                  <field name="reports_analytics" widget="radio" nolabel="1"/>
+                </group>
+
+                <!-- User Management -->
+                <group string="User Management">
+                  <field name="user_management" widget="radio" nolabel="1"/>
+                </group>
+
+              </group>
+            </page>
+
+            <!-- Technical Tab -->
+            <page string="Preferences" name="technical">
+              <group>
+                <field name="preferred_lang"/>
+              </group>
+            </page>
+
+          </notebook>
+
+        </sheet>
+            <chatter/>
+        <footer>
+          <button string="Discard" class="btn-secondary" special="cancel"/>
+        </footer>
+
+      </form>
+    </field>
+  </record>
+
+  <!-- ========================= -->
+  <!-- Search View -->
+  <!-- ========================= -->
+  <record id="view_edu_user_search" model="ir.ui.view">
+    <field name="name">edu.user.search</field>
+    <field name="model">edu.user</field>
+    <field name="arch" type="xml">
+      <search string="Search Education Users">
+
+        <!-- Free-text search -->
+        <field name="name" string="Name"/>
+        <field name="login" string="Login"/>
+        <field name="email" string="Email"/>
+
+        <!-- Filters by status -->
+        <filter string="Active" name="active_true" domain="[('active', '=', True)]"/>
+        <filter string="Inactive" name="active_false" domain="[('active', '=', False)]"/>
+        <separator/>
+
+        <!-- Access filters -->
+        <filter string="Student / Enrolment Access" name="students_enrolment_rw" domain="[('students_enrolment', '!=', 'none')]"/>
+        <filter string="Academy / Trainer Access" name="academy_trainer_rw" domain="[('academy_trainer', '!=', 'none')]"/>
+        <filter string="Programs / Offerings Access" name="course_offering_rw" domain="[('course_offering', '!=', 'none')]"/>
+        <filter string="Reports / Analytics Access" name="reports_analytics" domain="[('reports_analytics', '!=', 'none')]"/>
+        <filter string="User Management" name="user_management" domain="[('user_management', '!=', 'none')]"/>
+
+        <!-- Group by dropdown -->
+        <group>
+          <filter string="Student Access" name="group_students" context="{'group_by': 'students_enrolment'}"/>
+          <filter string="Academy Access" name="group_academy" context="{'group_by': 'academy_trainer'}"/>
+          <filter string="Course Access" name="group_course" context="{'group_by': 'course_offering'}"/>
+        </group>
+
+      </search>
+    </field>
+  </record>
+
+</odoo>

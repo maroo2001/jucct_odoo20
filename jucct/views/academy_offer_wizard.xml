@@ -1,0 +1,168 @@
+<odoo>
+  <!-- Wizard Form View -->
+  <record id="view_academy_offer_wizard_form" model="ir.ui.view">
+    <field name="name">academy.offer.wizard.form</field>
+    <field name="model">academy.offer.wizard</field>
+    <field name="arch" type="xml">
+      <form string="Offer a New Program - Wizard">
+        <sheet>
+          <!-- Progress and State Fields -->
+          <field name="state" invisible="1"/>
+
+          <!-- Step 1: Academy Selection -->
+          <div invisible="state != 'academy_basic'">
+            <div class="d-flex justify-content-between align-items-center w-100">
+              <div>
+                <h2>Step 1 - Academy Selection</h2>
+                <p class="text-muted">Select an existing academy or create a new one.</p>
+              </div>
+              <button name="toggle_create_new_academy"
+                      string="Create New Academy"
+                      type="object"
+                      class="btn-primary"
+                      invisible="create_new_academy"
+                      groups="jucct.group_academy_trainer_rw,jucct.group_academy_trainer_contract,base.group_system"/>
+              <button name="action_existing_academy"
+                      string="Use Existing Academy"
+                      type="object"
+                      class="btn-primary"
+                      invisible="not create_new_academy"/>
+            </div>
+
+            <field name="academy_id" placeholder="Select existing academy" invisible="create_new_academy" options="{'no_create': True, 'no_open': True}"/>
+
+            <group invisible="not create_new_academy" class="oe_subview mt-3" string="New Academy Details">
+              <group>
+                <field name="new_academy_name" placeholder="Academy name (required)"/>
+                <field name="new_academy_phone" placeholder="Phone"/>
+                <field name="new_academy_email" placeholder="Email"/>
+              </group>
+              <group>
+                <field name="country_id" placeholder="Country"/>
+                <field name="academy_notes" placeholder="Notes"/>
+              </group>
+              <p class="text-muted">Complete contact and contract information to activate academy for program offerings.</p>
+            </group>
+          </div>
+
+          <!-- Step 2: Academy Contract -->
+          <div invisible="state != 'academy_contract'">
+            <div class="oe_title mb24" row="2">
+              <h2>Step 2 - Academy Contract</h2>
+              <p class="text-muted">Provide contract dates and upload the signed contract document.</p>
+            </div>
+            <group>
+              <group>
+                <field name="academy_contract_start" placeholder="Official Contract Start date"/>
+                <field name="academy_contract_end" placeholder="Official Contract End date"/>
+                <field name="academy_contract_filename" placeholder="Official Contract Number" string="contract number"/>
+              </group>
+              <group>
+                <field name="responsible_employee_id" placeholder="The employee responsible for this contract"/>
+                <field name="attachment_ids" placeholder="attach the contract file here" filename="academy_contract_filename" widget="many2many_binary" options="{'no_create': True}"/>
+                <div class="o_row mt16">
+                  <span class="o_form_label">
+                    <strong>Academy Share (% of Revenue):</strong>
+                  </span>
+                  <div class="o_field_widget" style="margin-left: 8px;">
+                    <field name="revenue_share" class="oe_inline" nolabel="1" style="width:80px;"/>
+                    <span class="text-muted" style="margin-left: 6px;">%</span>
+                  </div>
+                </div>
+              </group>
+              <field name="academy_contract_notes" placeholder="Notes"/>
+            </group>
+          </div>
+
+          <!-- Step 3: Program Definition -->
+          <group invisible="state != 'program_basic'">
+            <div class="d-flex justify-content-between align-items-center w-100">
+              <div>
+                <h2>Step 3 - Program Definition</h2>
+                <p class="text-muted">Select an existing program or create a new one.</p>
+              </div>
+              <button name="toggle_create_new_program"
+                      string="Create New Program"
+                      type="object"
+                      class="btn-primary"
+                      invisible="create_new_program"/>
+              <button name="action_existing_program"
+                      string="Chose Existing Program"
+                      type="object"
+                      class="btn-primary"
+                      invisible="not create_new_program"/>
+            </div>
+
+            <field name="program_id" invisible="create_new_program" placeholder="Select existing program" options="{'no_create': True, 'no_open': True}"/>
+            <group invisible="not create_new_program" class="oe_subview" string="New Program Details">
+              <field name="new_program_name" placeholder="Program title (required)"/>
+              <field name="new_program_type" placeholder="Type of the program (course, diploma)"/>
+              <field name="new_program_venue" placeholder="Location of the program session (inside, outside, online)"/>
+              <field name="new_program_price" placeholder="Program Enrollment price"/>
+              <field name="new_program_comment" placeholder="Notes"/>
+              <p class="text-muted">Program approval dates will be required in the next step.</p>
+            </group>
+          </group>
+
+          <!-- Step 4: Program Approval -->
+          <group invisible="state != 'program_approval'">
+            <div class="mb-3">
+              <h2>Step 4 - Program Approval</h2>
+              <p class="text-muted">Enter official approval dates and upload approval documentation.</p>
+            </div>
+            <field name="program_approval_start" placeholder="Official start date of the approval"/>
+            <field name="program_approval_end" placeholder="Official end date of the approval"/>
+            <field name="approval_file" filename="approval_number" placeholder="Attach approval file here"/>
+            <field name="approval_number" placeholder="Official number of the approval"/>
+          </group>
+
+          <!-- Step 5: Program Offering -->
+          <div invisible="state != 'offering'">
+            <div class="mb-3">
+              <h2>Step 5 - Program Offering</h2>
+              <p class="text-muted">Set offering dates and pricing. Dates should align with program approval period when applicable.</p>
+            </div>
+            <group>
+              <field name="offering_start" placeholder="Start date of the program teaching period"/>
+              <field name="offering_end" placeholder="End date of the program teaching period"/>
+              <p class="text-muted">Custom price of this offering period</p>
+              <field name="offering_price"/>
+            </group>
+          </div>
+
+          <!-- Completion Step -->
+          <group invisible="state != 'done'">
+            <div class="mb-3">
+              <h2>Process Complete</h2>
+              <field name="summary_html" widget="html" readonly="1"/>
+              <p class="text-success">
+                <i class="oi" data-icon="check_circle"/> Program offering successfully created with unique reference number.
+                <br/>You may now proceed to session management or enrollment review.
+              </p>
+            </div>
+          </group>
+        </sheet>
+
+        <!-- Wizard Navigation -->
+        <footer>
+          <div class="d-flex justify-content-between align-items-center w-100">
+            <div>
+              <button string="Back" type="object" name="action_back" class="btn-secondary" invisible="state == 'academy_basic'"/>
+              <button string="Next" type="object" name="action_next" class="btn-primary" invisible="state == 'done'"/>
+              <button string="Close and open offering form" type="object" name="action_done" class="btn-secondary" invisible="state != 'done'"/>
+            </div>
+            <field name="progress" widget="progressbar" options="{'max': 100}" readonly="1"/>
+          </div>
+        </footer>
+      </form>
+    </field>
+  </record>
+
+  <!-- Wizard Action Definition -->
+  <record id="action_academy_offer_wizard" model="ir.actions.act_window">
+    <field name="name">Create Program Offering</field>
+    <field name="res_model">academy.offer.wizard</field>
+    <field name="view_mode">form</field>
+    <field name="target">new</field>
+  </record>
+</odoo>

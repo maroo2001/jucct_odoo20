@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="educational_student_report_list" model="ir.ui.view">
+        <field name="name">educational.student.report.list</field>
+        <field name="model">educational.student.report</field>
+        <field name="arch" type="xml">
+            <list string="Student Reports" create="false" edit="false" delete="false">
+                <field name="student_id"/>
+                <field name="program_type"/>
+                <field name="product_id" string="Course/Diploma"/>
+                <field name="academy_id" string="Academy / Center"/>
+                <field name="enrolment_status"/>
+                <field name="program_price" sum="Total Program Price"/>
+                <field name="total_paid" string="Amount Paid" sum="Total Paid"/>
+                <field name="remaining_balance" sum="Total Remaining Balance"/>
+                <field name="withdrawal_fine_sum" string="Withdrawal Fine" sum="Total Fines"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="educational_student_report_list_drill_program" model="ir.ui.view">
+        <field name="name">educational.student.report.list.drill.program</field>
+        <field name="model">educational.student.report</field>
+        <field name="arch" type="xml">
+            <list string="Program Drill Down" create="false" edit="false" delete="false">
+                <field name="product_id" string="Course/Diploma"/>
+                <field name="student_id" string="Student"/>
+                <field name="enrolment_status" string="Enrollment Status"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="educational_student_report_pivot" model="ir.ui.view">
+    <field name="name">educational.student.report.pivot</field>
+    <field name="model">educational.student.report</field>
+    <field name="arch" type="xml">
+        <pivot string="Student Analysis (Pivot)">
+            <field name="student_id" type="row"/>
+            <field name="product_id" type="col"/>
+            <field name="program_price" type="measure"/>
+            <field name="total_paid" type="measure"/>
+            <field name="remaining_balance" type="measure"/>
+            <field name="withdrawal_fine_sum" type="measure"/>
+            <field name="confirmed_students" type="measure"/>
+            <field name="withdrawn_students" type="measure"/>
+        </pivot>
+    </field>
+</record>
+
+
+    <record id="educational_student_report_graph" model="ir.ui.view">
+    <field name="name">educational.student.report.graph</field>
+    <field name="model">educational.student.report</field>
+    <field name="arch" type="xml">
+        <graph string="Student Analysis (Graph)" type="bar" stacked="False">
+            <field name="student_id" />
+            <field name="enrolment_status" type="col"/>
+            <field name="total_paid" type="measure"/>
+            <field name="remaining_balance" type="measure"/>
+            </graph>
+    </field>
+</record>
+
+    <record id="educational_student_report_search" model="ir.ui.view">
+        <field name="name">educational.student.report.search</field>
+        <field name="model">educational.student.report</field>
+        <field name="arch" type="xml">
+            <search string="Student Analysis">
+                <field name="student_id"/>
+                <field name="product_id" string="Course/Diploma"/>
+                <field name="academy_id"/>
+                <field name="program_type" string="Program Type"/>
+
+                <filter name="all_students" string="All Students" domain="[('enrolment_status', 'in', ['confirmed', 'withdrawn'])]"/>
+                <filter name="status_confirmed" string="Confirmed" domain="[('enrolment_status', '=', 'confirmed')]"/>
+                <filter name="status_withdrawn" string="Withdrawn" domain="[('enrolment_status', '=', 'withdrawn')]"/>
+                <filter name="has_payments" string="Has Payments" domain="[('total_paid', '>', 0)]"/>
+                <filter name="has_fines" string="Has Fines" domain="[('withdrawal_fine_sum', '>', 0)]"/>
+
+                <separator/>
+
+                <group>
+                    <filter name="group_program" string="Programs" context="{'group_by':'product_id'}"/>
+                    <filter name="group_student" string="Student" context="{'group_by':'student_id'}"/>
+                    <filter name="group_program_type" string="Program Type" context="{'group_by':'program_type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="educational_student_report_form" model="ir.ui.view">
+    <field name="name">educational.student.report.form</field>
+    <field name="model">educational.student.report</field>
+    <field name="arch" type="xml">
+        <form create="false" edit="false" delete="false">
+            <sheet>
+                <group>
+                    <group>
+                        <field name="student_id" options='{"no_open": True}'/>
+                        <field name="product_id" options='{"no_open": True}'/>
+                        <field name="academy_id" options='{"no_open": True}'/>
+                        <field name="program_type"/>
+                    </group>
+                    <group>
+                        <field name="enrolment_status"/>
+                        <field name="program_price"/>
+                        <field name="total_paid"/>
+                        <field name="remaining_balance"/>
+                        <field name="withdrawal_fine_sum"/>
+                    </group>
+                </group>
+            </sheet>
+        </form>
+    </field>
+</record>
+
+</odoo>

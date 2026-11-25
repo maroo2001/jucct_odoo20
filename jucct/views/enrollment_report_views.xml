@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="educational_enrollment_report_form" model="ir.ui.view">
+        <field name="name">educational.enrollment.report.form</field>
+        <field name="model">educational.enrollment.report</field>
+        <field name="arch" type="xml">
+            <form create="false" edit="false" delete="false">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="student_id" options='{"no_open": True}'/>
+                            <field name="course_id" string="Diploma/course" options='{"no_open": True}'/>
+                            <field name="program_type"/>
+                        </group>
+                        <group>
+                            <field name="academy_id" options='{"no_open": True}'/>
+                            <field name="enrollment_date"/>
+                            <field name="program_price" string="Program Price"/> <field name="paid_amount" string="Total Paid"/>
+                            <field name="remaining_balance" string="Remaining Balance"/> <field name="withdrawal_fine" string="Withdrawal Fine"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="educational_enrollment_report_list" model="ir.ui.view">
+        <field name="name">educational.enrollment.report.list</field>
+        <field name="model">educational.enrollment.report</field>
+        <field name="arch" type="xml">
+            <list string="Enrollment Details" create="false" edit="false" delete="false">
+                <field name="student_id" options='{"no_open": True}'/>
+                <field name="academy_id" options='{"no_open": True}'/>
+                <field name="course_id" options='{"no_open": True}'/>
+                <field name="enrollment_date"/>
+                <field name="program_price" sum="Program Price"/> <field name="paid_amount" sum="Total Paid"/>
+                <field name="remaining_balance" sum="Remaining Balance"/> <field name="withdrawal_fine" sum="Total Fines"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="educational_enrollment_report_pivot" model="ir.ui.view">
+        <field name="name">educational.enrollment.report.pivot</field>
+        <field name="model">educational.enrollment.report</field>
+        <field name="arch" type="xml">
+            <pivot string="Enrollment Analysis" sample="1">
+                <field name="enrollment_date" type="col" interval="month"/>
+                <field name="academy_id" type="row"/>
+                <field name="course_id" type="row"/>
+                <field name="enrollment_count" type="measure"/>
+                <field name="program_price" type="measure"/> <field name="paid_amount" type="measure"/>
+                <field name="remaining_balance" type="measure"/> <field name="withdrawal_fine" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="educational_enrollment_report_graph" model="ir.ui.view">
+        <field name="name">educational.enrollment.report.graph</field>
+        <field name="model">educational.enrollment.report</field>
+        <field name="arch" type="xml">
+            <graph string="Student Enrollments" type="bar" stacked="False">
+                <field name="student_id" type="row"/>
+                <field name="enrollment_date" type="col" interval="month"/>
+                <field name="enrollment_count" type="measure"/>
+                <field name="paid_amount" type="measure"/> 
+            </graph>
+        </field>
+    </record>
+
+    <record id="educational_enrollment_report_search" model="ir.ui.view">
+        <field name="name">educational.enrollment.report.search</field>
+        <field name="model">educational.enrollment.report</field>
+        <field name="arch" type="xml">
+            <search string="Enrollment Analysis">
+                <field name="student_id"/>
+                <field name="academy_id"/>
+                <field name="course_id"/>
+                <field name="enrollment_date"/>
+                <field name="program_price"/> <field name="paid_amount"/> 
+                <field name="remaining_balance"/> <filter string="Last 30 Days" name="last_30_days"
+                        domain="[('enrollment_date', '>=', (context_today() - datetime.timedelta(days=30)).strftime('%%Y-%%m-%%d'))]"/>
+                <separator/>
+
+                <group>
+                    <filter name="group_student" string="Student" context="{'group_by':'student_id'}"/>
+                    <filter name="group_academy" string="Academy" context="{'group_by':'academy_id'}"/>
+                    <filter name="group_program_type" string="Program Type" context="{'group_by':'program_type'}"/>
+                    <filter name="group_course" string="Course/Diploma" context="{'group_by':'course_id'}"/>
+                    <filter name="group_month" string="Enrollment Month"
+                            context="{'group_by':'enrollment_date:month', 'search_default_group_month': 1}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+</odoo>

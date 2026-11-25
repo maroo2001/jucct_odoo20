@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- ==================== Search View with Filters ==================== -->
+    <record id="view_academy_session_jucct_search" model="ir.ui.view">
+        <field name="name">academy.session.search</field>
+        <field name="model">academy.session</field>
+        <field name="arch" type="xml">
+            <search string="Sessions">
+                <!-- Search Fields -->
+                <field name="name" string="Session Title"/>
+                <field name="program_id" string="Program"/>
+                <field name="academy_id" string="Academy"/>
+                <field name="trainer_id" string="Trainer"/>
+                
+                <!-- Status Filters -->
+                <filter name="filter_draft" string="Draft" 
+                        domain="[('status', '=', 'draft')]"/>
+                <filter name="filter_scheduled" string="Scheduled" 
+                        domain="[('status', '=', 'scheduled')]"/>
+                <filter name="filter_done" string="Done" 
+                        domain="[('status', '=', 'done')]"/>
+                <filter name="filter_cancelled" string="Cancelled" 
+                        domain="[('status', '=', 'cancelled')]"/>
+                
+                <separator/>
+                
+                <!-- Program Type Filters -->
+                <filter name="filter_course" string="Courses" 
+                        domain="[('program_type', '=', 'course')]"/>
+                <filter name="filter_diploma" string="Diplomas" 
+                        domain="[('program_type', '=', 'diploma')]"/>
+                
+                <!-- Group By -->
+                <group>
+                    <filter name="group_academy" string="Academy" 
+                            context="{'group_by': 'academy_id'}"/>
+                    <filter name="group_program" string="Program" 
+                            context="{'group_by': 'program_id'}"/>
+                    <filter name="group_trainer" string="Trainer" 
+                            context="{'group_by': 'trainer_id'}"/>
+                    <filter name="group_status" string="Status" 
+                            context="{'group_by': 'status'}"/>
+                    <filter name="group_location" string="Location" 
+                            context="{'group_by': 'location'}"/>
+                    <filter name="group_offering" string="Offering" 
+                            context="{'group_by': 'offering_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ==================== List View ==================== -->
+    <record id="academy_session_jucct_list_view" model="ir.ui.view">
+        <field name="name">academy.session.list.custom</field>
+        <field name="model">academy.session</field>
+        <field name="priority">1</field>
+        <field name="arch" type="xml">
+            <list string="Sessions"  decoration-danger="record_type == 'not scheduled'">
+                <field name="name"/>
+                <field name="program_id" />
+                <field name="offering_id" optional="show"/>
+                <field name="program_type" column_invisible="1"/>
+                <field name="academy_id"/>
+                <field name="session_date" invisible="record_type == 'not scheduled'"/>
+                <field name="start_time" widget="float_time" optional="show" invisible="record_type == 'not scheduled'"/>
+                <field name="end_time" widget="float_time" optional="show" invisible="record_type == 'not scheduled'"/>
+                <field name="location" invisible="record_type == 'not scheduled'"/>
+                <field name="status" widget="badge" 
+                       decoration-info="status == 'draft'"
+                       decoration-success="status == 'scheduled'"
+                       decoration-muted="status == 'done'"
+                       decoration-danger="status == 'cancelled'" invisible="record_type == 'not scheduled'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ==================== Form View ==================== -->
+    <record id="academy_session_jucct_form_view" model="ir.ui.view">
+        <field name="name">academy.session.form</field>
+        <field name="model">academy.session</field>
+        <field name="arch" type="xml">
+            <form string="Session">
+                <header>
+                    <button name="action_schedule" 
+                            string="Schedule" 
+                            type="object"
+                            class="oe_highlight"
+                            invisible="status != 'draft'"
+                            confirm="Are you sure you want to schedule this session?"/>
+                    
+                    <button name="action_mark_done" 
+                            string="Mark as Done" 
+                            type="object"
+                            class="oe_highlight"
+                            invisible="status in ['draft', 'done', 'cancelled']"
+                            confirm="Are you sure you want to mark this session as done?"/>
+                    
+                    <button name="action_cancel" 
+                            string="Cancel Session" 
+                            type="object"
+                            class="btn-danger"
+                            invisible="status in ['done', 'cancelled']"
+                            confirm="Are you sure you want to cancel this session?"/>
+                    
+                    <field name="status" widget="statusbar" 
+                           statusbar_visible="draft,scheduled,done"/>
+                </header>
+                
+                <sheet>
+                    <field name="is_current_user_trainer" invisible="1"/>
+                    <field name="academy_trainer_ids" invisible="1"/>
+                    <field name="offering_trainer_ids" invisible="1"/>
+                    <field name="available_offering_ids" invisible="1"/>
+                    <field name="record_type" invisible="1"/>
+                    
+                    <group>
+                        <group>
+                            <field name="name" readonly="1"/>
+                            <field name="program_type" readonly="record_type == 'session day' and status != 'draft'"/>
+                            <field name="program_id" 
+                                options="{'no_create': True, 'no_quick_create': True, 'no_open': True}"
+                                context="{'tree_view_ref': 'jucct.product_template_session_search_jucct_list_view'}" readonly="record_type == 'session day' and status != 'draft'"/>
+                            <field name="academy_id" 
+                                options="{'no_create': True, 'no_quick_create': True, 'no_open': True}"
+                                context="{'tree_view_ref': 'jucct.res_partner_academy_session_search_jucct_list_view'}" readonly="record_type == 'session day' and status != 'draft'"/>
+                            <field name="offering_id" 
+                                domain="[('id', 'in', available_offering_ids)]"
+                                options="{'no_create': True}" readonly="record_type == 'session day' and status != 'draft'"/>
+                            <field name="trainer_id" invisible="record_type != 'session day'" options="{'no_create': True, 'no_quick_create': True, 'no_open': True}"/>
+                        </group>
+                        
+                        <group>
+                            <field name="id" invisible="1"/>
+                            <field name="date_start" invisible="record_type == 'session day'"/>
+                            <field name="date_end" invisible="record_type == 'session day'"/>
+                            <field name="start_time" invisible="record_type != 'session day'"/>
+                            <field name="end_time" invisible="record_type != 'session day'"/>
+                            <field name="session_date" readonly="1" invisible="id == 0"/>
+                            <field name="location"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Session Days" invisible="record_type == 'session day'">
+                            <field name="session_day_ids">
+                                <list editable="bottom">
+                                    <field name="day_of_week"/>
+                                    <field name="trainer_id" 
+                                        domain="[('id', 'in', parent.academy_trainer_ids)]"
+                                        options="{'no_create': True}"/>
+                                    <field name="start_time" widget="float_time"/>
+                                    <field name="end_time" widget="float_time"/>
+                                </list>
+                            </field>
+                            
+                            <button name="action_generate_sessions" 
+                                    type="object" 
+                                    string="Generate Sessions from Days" 
+                                    class="btn-primary"
+                                    context="{'delete_template_session': True}"
+                                    invisible="not session_day_ids"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- ==================== Trainer Readonly Form View ==================== -->
+    <record id="trainer_session_readonly_jucct_form_view" model="ir.ui.view">
+        <field name="name">academy.session.trainer.readonly.form</field>
+        <field name="model">academy.session</field>
+        <field name="arch" type="xml">
+            <form string="Session">
+                <header>
+                    <button name="action_schedule" 
+                            string="Schedule" 
+                            type="object"
+                            class="oe_highlight"
+                            invisible="status != 'draft'"
+                            confirm="Are you sure you want to schedule this session?"/>
+                    
+                    <button name="action_mark_done" 
+                            string="Mark as Done" 
+                            type="object"
+                            class="oe_highlight"
+                            invisible="status in ['draft', 'done', 'cancelled']"
+                            confirm="Are you sure you want to mark this session as done?"/>
+                    
+                    <button name="action_cancel" 
+                            string="Cancel Session" 
+                            type="object"
+                            class="btn-danger"
+                            invisible="status in ['done', 'cancelled']"
+                            confirm="Are you sure you want to cancel this session?"/>
+                    
+                    <field name="status" widget="statusbar" 
+                           statusbar_visible="draft,scheduled,done"/>
+                </header>
+                
+                <sheet>
+                    <group>
+                        <group>
+                            <!-- Title ONLY editable -->
+                            <field name="name" readonly="1"/>
+                            <!-- Everything else readonly -->
+                            <field name="program_type" readonly="1"/>
+                            <field name="program_id" readonly="1" 
+                                options="{'no_open': True}"/>
+                            <field name="academy_id" readonly="1" 
+                                options="{'no_open': True}"/>
+                            <field name="offering_id" readonly="1" 
+                                options="{'no_open': True}"/>
+                            <field name="trainer_id" readonly="1" 
+                                options="{'no_open': True}"/>
+                        </group>
+                        
+                        <group>
+                            <field name="date_start" readonly="1"/>
+                            <field name="date_end" readonly="1"/>
+                            <field name="session_date" readonly="1"/>
+                            <field name="location" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+
+    <!-- ==================== Custom Program List for Session Selection ==================== -->
+    <record id="product_template_session_search_jucct_list_view" model="ir.ui.view">
+        <field name="name">product.template.session.search.list</field>
+        <field name="model">product.template</field>
+        <field name="priority">1</field>
+        <field name="arch" type="xml">
+            <list string="Programs" create="false">
+                <field name="name" string="Program Name"/>
+                <field name="program_type" string="Type"/>
+                <field name="list_price" string="Price"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ==================== Custom Academy List for Session Selection ==================== -->
+    <record id="res_partner_academy_session_search_jucct_list_view" model="ir.ui.view">
+        <field name="name">res.partner.academy.session.search.list</field>
+        <field name="model">res.partner</field>
+        <field name="priority">1</field>
+        <field name="arch" type="xml">
+            <list string="Academies" create="false">
+                <field name="name" string="Academy Name"/>
+                <field name="phone" string="Phone"/>
+                <field name="email" string="Email"/>
+                <field name="city" string="City"/>
+                <field name="country_id" string="Country"/>
+            </list>
+        </field>
+    </record>
+
+
+</odoo>

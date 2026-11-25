@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Root Menu -->
+    <menuitem id="menu_educational_root" name="Educational Center" sequence="1"/>
+
+    <!-- dashboard -->
+    <menuitem id="menu_dashboard" name="Dashboard" parent="menu_educational_root" groups="jucct.group_dashboard,base.group_system" action="educational_dashboard_jucct_action" sequence="0"/>
+    <!-- Programs Menu -->
+    <menuitem id="menu_programs" name="Programs"  groups="jucct.group_course_offering_rw,jucct.group_course_offering_read,base.group_system" parent="menu_educational_root" sequence="10"/>
+    <menuitem id="menu_offering" name="offering" groups="jucct.group_course_offering_rw,jucct.group_course_offering_read,base.group_system" action="academy_offerings_jucct_action" parent="menu_programs" sequence="5"/>
+
+	<menuitem id="menu_courses" name="Courses" groups="jucct.group_course_offering_rw,jucct.group_course_offering_read,base.group_system" action="educational_courses_jucct_action" parent="menu_programs" sequence="10"/>
+	<menuitem id="menu_diplomas" name="Diplomas" groups="jucct.group_course_offering_rw,jucct.group_course_offering_read,base.group_system" action="educational_diplomas_jucct_action" parent="menu_programs" sequence="20"/>
+
+    <menuitem id="menu_sessions" name="Sessions" groups="jucct.group_course_offering_rw,jucct.group_course_offering_read,base.group_system" action="academy_session_jucct_action" parent="menu_programs" sequence="30"/>
+
+    <!-- Academies Menu -->
+    <menuitem id="menu_academies" name="Academy Management" groups="jucct.group_academy_trainer_read,jucct.group_academy_trainer_rw,jucct.group_academy_trainer_contract,base.group_system" parent="menu_educational_root" sequence="20"/>
+    <menuitem id="menu_academy_list" name="Academies"  groups="jucct.group_academy_trainer_rw,jucct.group_academy_trainer_contract,base.group_system" parent="menu_academies" sequence="10" action="academies_only_jucct_action"/>
+    <menuitem id="menu_academy_list1" name="Academies"  groups="jucct.group_academy_trainer_read" parent="menu_academies" sequence="20" action="academies_only_jucct_action1"/>
+
+    <menuitem id="menu_contracts" name="Contracts"  groups="jucct.group_academy_trainer_contract,base.group_system" parent="menu_academies" sequence="30"/>
+
+    <menuitem id="menu_trainers" name="Trainers Management" groups="jucct.group_academy_trainer_read,jucct.group_academy_trainer_rw,jucct.group_academy_trainer_contract,base.group_system" parent="menu_educational_root" sequence="30"/>
+    <menuitem id="menu_trainers_list" name="Trainers"  groups="jucct.group_academy_trainer_rw,jucct.group_academy_trainer_contract,base.group_system" parent="menu_trainers" sequence="20" action="trainer_jucct_action"/>
+    <menuitem id="menu_trainers_list1" name="Trainers"  groups="jucct.group_academy_trainer_read" parent="menu_trainers" sequence="20" action="trainer_jucct_action1"/>
+    
+
+    <!-- Students Menu -->
+    <menuitem id="menu_students" name="Students" groups="jucct.group_student_enrolment_read,jucct.group_student_enrolment_rw,base.group_system" parent="menu_educational_root" sequence="40"/>
+    <menuitem id="menu_student_list" name="Students" groups="jucct.group_student_enrolment_rw,base.group_system" parent="menu_students" sequence="10" action="students_only_jucct_action"/>
+    <menuitem id="menu_student_list1" name="Students" groups="jucct.group_student_enrolment_read" parent="menu_students" sequence="20" action="students_only_jucct_action1"/>
+    <menuitem id="menu_student_enrollments" name="Student Enrollments" groups="jucct.group_student_enrolment_read,jucct.group_student_enrolment_rw,base.group_system"  parent="menu_students" sequence="30"/>
+    <menuitem id="menu_courses_enrollments" name="course enrollments" groups="jucct.group_student_enrolment_read,jucct.group_student_enrolment_rw,base.group_system" action="course_enrollment_jucct_action" parent="menu_student_enrollments" sequence="10"/>
+    <menuitem id="menu_diploma_enrollments" name="diploma enrollments" groups="jucct.group_student_enrolment_read,jucct.group_student_enrolment_rw,base.group_system" action="diploma_enrollment_jucct_action" parent="menu_student_enrollments" sequence="20"/>
+
+
+    <!-- Billing and Invoicing Menu -->
+    <menuitem id="menu_billing" name="Invoicing" groups="jucct.group_financial_analytics,base.group_system" parent="menu_educational_root" sequence="40"/>
+    <menuitem id="menu_invoices" name="Invoices" groups="jucct.group_financial_analytics,base.group_system" parent="menu_billing" action="educational_customer_invoices_jucct_action" sequence="10"/>
+    <menuitem id="menu_payment_rules" name="Payment Rules" groups="jucct.group_financial_analytics,base.group_system" parent="menu_billing" action="educational_payment_terms_jucct_action" sequence="20"/>
+    <menuitem id="menu_academy_settlements" groups="jucct.group_financial_analytics,base.group_system" name="Academy Settlements" parent="menu_billing" sequence="30" action="academy_settlement_jucct_action" />
+    <!-- users -->
+    <menuitem id="menu_edu_users"
+            name="Users"
+            parent="menu_educational_root"
+            action="action_edu_user"
+            sequence="60" groups="jucct.group_user_management,base.group_system"/>
+    <menuitem id="menu_edu_user"
+            name="Users"
+            parent="menu_edu_users"
+            action="action_edu_user"
+            sequence="5" groups="jucct.group_user_management,base.group_system"/>
+        <menuitem id="work_flow_wizard" 
+                name="➕ offer a program" 
+                parent="menu_educational_root" 
+                sequence="70" 
+                action="action_academy_offer_wizard" groups="jucct.group_course_offering_rw,jucct.group_course_offering_read,base.group_system"/>
+
+
+        <!-- Menu item (optional) -->
+        <menuitem id="menu_student_bulk_import" 
+                  name="📥 Bulk Import Enrollments" 
+                  parent="menu_educational_root" 
+                  action="action_student_bulk_import" 
+                  sequence="71"/>
+
+
+        <!-- Reports Menu -->
+        <menuitem id="menu_educational_reports" 
+                name="Reports" 
+                parent="menu_educational_root" 
+                sequence="60"
+                groups="jucct.group_reports,base.group_system"/>
+
+        <menuitem id="menu_report_students" 
+                name="Student Reports" 
+                parent="menu_educational_reports" 
+                sequence="10" 
+                action="educational_report_students_jucct_action"
+                groups="jucct.group_reports,base.group_system"/>
+
+        <menuitem id="menu_report_courses" 
+                name="Programs Reports" 
+                parent="menu_educational_reports" 
+                sequence="20" 
+                action="educational_report_course_action"
+                groups="jucct.group_reports,base.group_system"/>
+
+        <menuitem id="menu_report_enrollments" 
+                name="Enrollment Reports" 
+                parent="menu_educational_reports" 
+                sequence="30" 
+                action="educational_report_enrollment_jucct_action"
+                groups="jucct.group_reports,base.group_system"/>
+
+        <menuitem id="menu_report_academy_performance" 
+                name="Academy Reports" 
+                parent="menu_educational_reports" 
+                sequence="40" 
+                action="academy_performance_jucct_action"
+                groups="jucct.group_reports,base.group_system"/>
+
+</odoo>

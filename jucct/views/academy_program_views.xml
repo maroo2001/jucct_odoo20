@@ -1,0 +1,118 @@
+<odoo>
+    <!-- Academy Program Offering List View -->
+    <record id="academy_program_offering_jucct_list" model="ir.ui.view">
+        <field name="name">academy.program.offering.list</field>
+        <field name="model">academy.program.offering</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="academy_id"/>
+                <field name="program_id"/>
+                <field name="program_type"/>
+                <field name="price"/>
+                <field name="start_date"/>
+                <field name="end_date"/>
+                <field name="status"/>
+                <field name="sequence_number" string="Reference" optional="show"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Academy Program Offering Form View -->
+    <record id="academy_program_offering_jucct_form" model="ir.ui.view">
+        <field name="name">academy.program.offering.form</field>
+        <field name="model">academy.program.offering</field>
+        <field name="arch" type="xml">
+            <form string="Program Offering">
+                <sheet>
+                    <field name="academy_trainer_ids" invisible="1"/>
+                    <field name="session_generated" invisible="1"/>
+
+                    <!-- Offering Reference Number -->
+                    <div class="oe_title">
+                        <label for="sequence_number" string="Offering Reference" class="oe_edit_only"/>
+                        <h3>
+                            <field name="sequence_number" readonly="1" class="oe_inline"/>
+                            <button name="action_generate_sequence_number" type="object" string="Generate Sequence Number" 
+                        class="btn-primary" invisible= "sequence_number != False or not id" />
+
+                        </h3>
+                    </div>
+
+                    <group>
+                        <group>
+                            <field name="academy_id" 
+                                   context="{'default_edu_type': 'academy', 'form_view_ref': 'jucct.academy_jucct_form_view', 'list_view_ref' : 'jucct.academy_jucct_list_view'}"
+                                   options="{'no_quick_create': True , 'no_open' : True}"/>
+                            <field name="program_id" 
+                                   context="{'default_pro_read':True , 'form_view_ref': 'jucct.educational_jucct_form_view', 'list_view_ref': 'jucct.educational_jucct_list_view'}"
+                                   options="{'no_quick_create': True}"/>
+                            <field name="price" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                        </group>
+                        <group>
+                            <field name="start_date"/>
+                            <field name="end_date"/>
+                            <field name="status" widget="badge" 
+                                   decoration-success="status == 'active'"
+                                   decoration-danger="status == 'expired'"
+                                   decoration-warning="status == 'draft'"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Session Days">
+                            <field name="session_day_ids">
+                                <list string="Session Days" editable="bottom">
+                                    <field name="academy_trainer_ids" column_invisible="1"/>
+                                    <field name="day_of_week"/>
+                                    <field name="trainer_id" 
+                                           domain="[('id', 'in', academy_trainer_ids)]"
+                                           options="{'no_create': True, 'no_quick_create': True}"
+                                           context="{'form_view_ref': 'jucct.trainer_jucct_form_view'}"/>
+                                    <field name="start_time" widget="float_time"/>
+                                    <field name="end_time" widget="float_time"/>
+                                </list>
+                            </field>
+                            
+                            <button name="create_sessions" 
+                                    type="object" 
+                                    string="Generate Sessions" 
+                                    class="btn-primary"
+                                    confirm="This will create sessions based on Session Days. Existing sessions will NOT be duplicated. Continue?"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+    
+    <!-- Academy Program Offering Search View -->
+    <record id="academy_program_offering_jucct_search_view" model="ir.ui.view">
+        <field name="name">academy.program.offering.search</field>
+        <field name="model">academy.program.offering</field>
+        <field name="arch" type="xml">
+            <search string="Search Program Offerings">
+                <field name="sequence_number" string="Reference" filter_domain="[('sequence_number', 'ilike', self)]"/>
+                <field name="academy_id"/>
+                <field name="program_id"/>
+                <field name="status"/>
+                <field name="program_type"/>
+
+                <filter string="Active" name="active" domain="[('status','=','active')]"/>
+                <filter string="Draft" name="draft" domain="[('status','=','draft')]"/>
+                <filter string="Expired" name="expired" domain="[('status','=','expired')]"/>
+                
+                <separator/>
+                <filter string="Courses" name="courses" domain="[('program_type','=','course')]"/>
+                <filter string="Diplomas" name="diplomas" domain="[('program_type','=','diploma')]"/>
+
+                <group>
+                    <filter name="academy" string="Academy" context="{'group_by': 'academy_id'}"/>
+                    <filter name="program" string="Program" context="{'group_by': 'program_id'}"/>
+                    <filter name="status" string="Status" context="{'group_by': 'status'}"/>
+                    <filter name="program_type" string="Program Type" context="{'group_by': 'program_type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+</odoo>

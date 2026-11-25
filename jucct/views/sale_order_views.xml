@@ -1,0 +1,270 @@
+<odoo>
+<!--enrolment form view (using sale.order as a database model)-->
+<record id="enrollment_jucct_form_view" model="ir.ui.view">
+<field name="name">sale.order.form</field>
+<field name="model">sale.order</field>
+<field name="arch" type="xml">
+<form string="Sales Order" class="o_sale_order">
+    <header>
+        <button id="create_invoice" name="create_regular_invoice_directly_action" string="Create Invoice" type="object" class="btn-primary" data-hotkey="q" invisible="invoice_status != 'to invoice'"/>
+        <button id="create_invoice_percentage" name="%(sale.action_view_sale_advance_payment_inv)d" string="Create Invoice" type="action" context="{'default_advance_payment_method': 'percentage'}" data-hotkey="q" invisible="invoice_status != 'no' or state != 'sale'"/>
+        <button name="action_confirm" id="action_confirm" data-hotkey="q" string="Confirm" class="btn-primary" type="object" context="{'validate_analytic': True}" invisible="state != 'sent'"/>
+        <button name="action_confirm" data-hotkey="q" string="Confirm" type="object" context="{'validate_analytic': True}" invisible="state != 'draft'"/>
+        <button name="action_rset_to_draft" invisible="enrolment_status != 'confirmed' and enrolment_status == 'draft'" type="object" string="reset to draft" data-hotkey="w"/>
+        <button name="action_withdraw_student"
+                string="Withdraw"
+                type="object"
+                class="btn-secondary"
+                invisible="enrolment_status != 'confirmed' and not invoice_ids and invoice_ids.status_in_payment != 'paid'"/>
+
+            <field name="enrolment_status" widget="statusbar" 
+                statusbar_visible="draft,confirmed,withdrawn"
+                clickable="True"
+                class="oe_statusbar" invisible="not is_enrolment"/>
+    </header>
+
+
+    
+    <div class="alert alert-warning" role="alert" invisible="partner_credit_warning == ''">
+        <field name="partner_credit_warning"/>
+    </div>
+    <div class="alert alert-warning p-3 text-center" role="alert" invisible="state not in ['draft', 'sent'] or not has_archived_products">
+        <span>Warning: This record contains archived courses</span>
+    </div>
+    <div class="alert alert-warning w-100 d-flex align-items-center gap-1" invisible="state != 'draft' or not duplicated_order_ids" role="alert">
+        <span>Warning: this enrolment record might be a duplicate of</span>
+        <field name="duplicated_order_ids" widget="x2many_buttons" string="Duplicated Documents"/>
+    </div>
+    <sheet>
+        <div class="oe_button_box" name="button_box">
+            <button name="action_view_invoice" type="object" class="oe_stat_button" icon="edit_square" invisible="invoice_count == 0">
+                <field name="invoice_count" widget="statinfo" string="Invoices"/>
+            </button>
+        </div>
+        <div class="oe_title">
+            <h1>
+                <field name="name" readonly="1"/>
+            </h1>
+        </div>
+        <group name="sale_header">
+            <group name="partner_details">
+                <field name="program_type" widget="radio" invisible="context.get('show_choice', True)" options="{'horizontal': true}" readonly="id"></field>
+                <field name="partner_id" string="student" context="{'default_edu_type': 'student', 'form_view_ref': 'jucct.student_jucct_form_view','list_view_ref': 'jucct.student_jucct_list_view'}" placeholder="Type to find a student..." readonly="state in ['cancel', 'sale']"  domain="[('edu_type', '=', 'student')]" options="{'no_open': True, 'no_quick_create': True}"/>
+                <field name="partner_invoice_id" groups="account.group_delivery_invoice_address" options="{'no_quick_create': True}" context="{'default_type':'invoice', 'show_address': False, 'show_vat': False, 'default_parent_id': partner_id}" readonly="state == 'cancel' or locked"/>
+                <field name="payment_term_id" options="{'no_open': True, 'no_create': True}"/>
+            </group>
+            <group name="order_details">
+                <field name="date_order" string="enrolment date"  readonly="state in ['cancel', 'sale']"/>
+                <field name="apply_fine" invisible="enrolment_status != 'withdrawn'" readonly="1"/>
+                <field name="withdrawal_fine" invisible="enrolment_status != 'withdrawn' or not apply_fine" readonly="1"/>
+            </group>
+        </group>
+        <notebook>
+            <page string="courses" name="order_lines" invisible="program_type != 'course'">
+                <field name="order_line" widget="sol_o2m" mode="list,kanban" readonly="state == 'cancel' or locked" context="{'default_is_enrolment' : True}">
+                    <list string="Sales Order Lines" limit="200" decoration-warning="state in ['draft', 'sent'] and is_product_archived">
+                        <control>
+                            <create name="add_product_control" string="Add a course"/>
+                        </control>
+                                <field name="product_id" string="Product Variant" options="{'no_open': True, 'no_create': True }" readonly="not product_updatable"  force_save="1" context="{'partner_id': parent.partner_id,'quantity': product_uom_qty,'pricelist': parent.pricelist_id,'uom':product_uom_id,'company_id': parent.company_id,'default_lst_price': price_unit,'default_uom_id': product_uom_id,'form_view_ref': 'jucct.educational_jucct_form_view' ,'default_is_program': True}" optional="hide" domain="[('sale_ok', '=', True)]" widget="sol_product_many2one" column_invisible="True"/>
+                                <field name="product_template_id" string="course" readonly="id and not product_updatable"  context="{'partner_id': parent.partner_id,'quantity': product_uom_qty,'pricelist': parent.pricelist_id,'uom':product_uom_id,'company_id': parent.company_id,'default_list_price': price_unit,'default_uom_id': product_uom_id,'form_view_ref': 'jucct.educational_jucct_form_view' ,'default_is_program': True}" options="{'no_open': True, 'no_create_edit': True }" optional="show" domain="[('sale_ok', '=', True),('program_type','=','course'),('status','=','active')]" widget="sol_product_many2one" />
+                                <field name="name" widget="sol_text" column_invisible="True"/>
+                                <field name="academy_id" domain="[('edu_type', '=', 'academy'), ('contract_status', '=', 'active')]" context="{'default_edu_type': 'academy', 'form_view_ref': 'jucct.academy_jucct_form_view'}" options="{'no_create': True}"/>
+                                <field name="class_offering_id" string="offer" context="{'default_program_id': product_template_id}"/>
+                                <field name="price_subtotal" sum="Total" widget="monetary" options="{'currency_field': 'currency_id'}" column_invisible="parent.company_price_include == 'tax_included'" invisible="is_downpayment" string="Amount"/>
+                                <field name="price_total" column_invisible="parent.company_price_include == 'tax_excluded'" invisible="is_downpayment" string="Amount"/>
+                                <field name="currency_id" column_invisible="True"/>
+                    </list>
+                    <form context="{'default_is_enrolment' : True}" >
+                        <group>
+                            <group>
+                            <field name="program_id" string="course" readonly="id and not product_updatable"  context="{'edit': False,'partner_id': parent.partner_id,'quantity': product_uom_qty,'pricelist': parent.pricelist_id,'uom':product_uom_id,'company_id': parent.company_id,'default_list_price': price_unit,'default_uom_id': product_uom_id,'form_view_ref': 'jucct.educational_jucct_form_view', 'list_view_ref': 'jucct.educational_jucct_list_view' ,'default_is_program': True}" options="{'no_open': True, 'no_create_edit': True, 'no_create': True }" optional="show" domain="[('sale_ok', '=', True),('program_type','=','course'),('status','=','active')]" placeholder="type to find the course"/>
+                            <field name="academy_id" domain="[
+    '|',
+    '&amp;','&amp;',
+        ('edu_type', '=', 'academy'),
+        ('offered_program_ids.program_id', '=', product_template_id),
+        ('contract_status', '=', 'active'),
+    '&amp;',
+        ('id', '=', company_id),
+        ('offered_program_ids.program_id', '=', product_template_id)
+]"  context="{'default_edu_type': 'academy', 'form_view_ref': 'jucct.academy_jucct_form_view', 'list_view_ref': 'jucct.academy_jucct_list_view'}" options="{'no_open': True, 'no_create_edit': True, 'no_create': True }"/>
+                            </group>
+                            <group>
+                                <field name="class_offering_id" string="offering" domain="[('program_id', '=', product_template_id), ('status', 'in' , ['active','pending']), ('academy_id', '=', academy_id)]" options="{'no_open': True, 'no_create_edit': True, 'no_create_open': True }"/>
+                                <field name="price_subtotal" string="Amount"/>
+                            </group>
+                            </group>
+                            
+                            </form>
+                        </field>
+                        <group name="note_group" col="6" class="mt-2 mt-md-0">
+                            <group colspan="4" class="order-1 order-lg-0">
+                                <field colspan="2" name="note" nolabel="1" placeholder="add notes and attachments here"/>
+                            </group>
+                        </group>
+                    </page>
+                    <page string="program" name="order_lines" invisible="program_type != 'diploma'">
+                        <field name="order_line" widget="sol_o2m" mode="list,kanban" readonly="state == 'cancel' or locked" options="{'no_create': True, 'limit': 1}" context="{'default_is_enrolment': True, 'default_program_type' : 'diploma'}">
+                            <list string="Sales Order Lines" limit="200" decoration-warning="state in ['draft', 'sent'] and is_product_archived">
+                                <control>
+                                    <create name="add_product_control" string="chose a program"/>
+                                </control>
+
+                                <field name="name" widget="sol_text" column_invisible="True"/>
+                                <field name="academy_id" domain="[('edu_type', '=', 'academy'), ('contract_status', '=', 'active')]" context="{'default_edu_type': 'academy', 'form_view_ref': 'jucct.academy_jucct_form_view'}"/>
+                                <field name="year"/>
+                                <field name="semester"/>
+                                <field name="class_offering_id" string="offer" context="{'default_program_id': product_template_id}"/>
+                                <field name="price_subtotal" sum="Total" widget="monetary" options="{'currency_field': 'currency_id'}" column_invisible="parent.company_price_include == 'tax_included'" invisible="is_downpayment" string="Amount"/>
+                                <field name="price_total" column_invisible="parent.company_price_include == 'tax_excluded'" invisible="is_downpayment" string="Amount"/>
+                                <field name="currency_id" column_invisible="True"/>
+                            </list>
+                            <form>
+                            <group>
+                            <group>
+                            <field name="program_id" string="diploma" readonly="id and not product_updatable"  context="{'edit': False,'partner_id': parent.partner_id,'quantity': product_uom_qty,'pricelist': parent.pricelist_id,'uom':product_uom_id,'company_id': parent.company_id,'default_list_price': price_unit,'default_uom_id': product_uom_id,'form_view_ref': 'jucct.educational_jucct_form_view', 'list_view_ref': 'jucct.educational_jucct_list_view' ,'default_is_program': True, 'search_default_status' : 'active' }" options="{'no_open': True, 'no_create': True, 'no_create_open': True,  'no_search' : True}" optional="show" domain="[('sale_ok', '=', True),('program_type','=','diploma'),('status','=','active')]"  placeholder="type to find the program" search=''/>
+                            <field name="academy_id" domain="[
+    '|',
+    '&amp;','&amp;',
+        ('edu_type', '=', 'academy'),
+        ('offered_program_ids.program_id', '=', product_template_id),
+        ('contract_status', '=', 'active'),
+    '&amp;',
+        ('id', '=', company_id),
+        ('offered_program_ids.program_id', '=', product_template_id)
+]"  context="{'default_edu_type': 'academy', 'form_view_ref': 'jucct.academy_jucct_form_view', 'list_view_ref': 'jucct.academy_jucct_list_view', 'search_default_filter_active' : 1}" options="{'no_open': True, 'no_create_edit': True, 'no_create': True }"/>
+                            <field name="year"/>
+                            </group>
+                            <group>
+                                <field name="semester"/>
+                                <field name="class_offering_id" string="offering" domain="offering_domain"  options="{'no_open': True, 'no_create': True }"/>
+                                <field name="price_subtotal" column_invisible="parent.company_price_include == 'tax_included'" invisible="is_downpayment" string="Amount"/>
+                            </group>
+                            </group>
+                            </form>
+                            </field>
+                        <group name="note_group" col="6" class="mt-2 mt-md-0">
+                            <group colspan="4" class="order-1 order-lg-0">
+                                <field colspan="2" name="note" nolabel="1" placeholder="add notes here"/>
+                            </group>
+                        </group>
+
+                        
+                    </page>
+                </notebook>
+            </sheet>
+            <chatter/>
+            </form>
+            </field>
+            </record>
+
+<!-- enrolment list view -->     
+<record id="enrollment_jucct_list_view" model="ir.ui.view">
+<field name="name">sale.order.list</field>
+<field name="model">sale.order</field>
+<field name="priority" eval="1"/>
+<field name="arch" type="xml">
+<list string="Sales Orders">
+    <field name="partner_id" string="student"/>
+    <field name="program_type" string="program type"/>
+    <field name="date_order" string = "enrolment Date"/>
+    <field name="enrolment_status" string="Student Status"/>
+    <field name="order_line" string="programs" widget="many2many_tags"/>
+    <field name="program_price" string="Program Price" />
+    <field name="apply_fine" invisible="enrolment_status != 'withdrawn'"/>
+    <field name="withdrawal_fine" invisible="enrolment_status != 'withdrawn' or not apply_fine"/>
+</list>
+</field>
+</record>
+
+<!-- modifying sales order form to show enrolment fields conditionally -->    
+<record id="sale_order_jucct_form_view_inherit" model="ir.ui.view">
+<field name="name">sale.order.form.enrolment</field>
+<field name="model">sale.order</field>
+<field name="inherit_id" ref="sale.view_order_form"/>
+<field name="arch" type="xml">
+    <xpath expr="//div[@class='oe_title']/h1" position="before">
+        <field name="program_type" widget="radio" options="{'horizontal': true}" invisible="is_enrolment == 0"/>
+    </xpath>
+    <xpath expr="//field[@name='order_line']/list" position="inside">
+        <field name="academy_id" column_invisible="parent.is_enrolment == 0"/>
+        <field name="year" column_invisible="parent.is_enrolment == 0"/>
+        <field name="semester" column_invisible="parent.is_enrolment == 0"/>
+    </xpath>
+    <xpath expr="//field[@name='order_line']/list//field[@name='product_uom_qty']" position="attributes">
+        <attribute name="column_invisible">parent.is_enrolment</attribute>
+    </xpath>
+    <xpath expr="//field[@name='order_line']/list//field[@name='qty_delivered']" position="attributes">
+        <attribute name="column_invisible">parent.is_enrolment</attribute>
+    </xpath>
+    <xpath expr="//field[@name='order_line']/list//field[@name='qty_invoiced']" position="attributes">
+        <attribute name="column_invisible">parent.is_enrolment</attribute>
+    </xpath>
+</field>
+</record>
+
+<!-- Wizard View for Withdrawal Fine -->
+<record id="view_withdrawal_fine_wizard_form" model="ir.ui.view">
+    <field name="name">withdrawal.fine.wizard.form</field>
+    <field name="model">withdrawal.fine.wizard</field>
+    <field name="arch" type="xml">
+        <form string="Set Withdrawal Fine">
+            <sheet>
+                <group>
+                    <group>
+                        <field name="apply_fine" string="Apply Withdrawal Fine?" />
+                        <field name="withdrawal_fine" string="Fine Amount" invisible="not apply_fine" required="apply_fine"/>
+                    </group>
+                </group>
+               <footer>
+    <div>
+        <button name="action_withdraw_without_fine" string="Withdraw Without Fine" type="object" class="btn-secondary"
+                invisible="apply_fine"/>
+        <button name="action_confirm_withdrawal" string="Confirm Withdrawal" type="object" class="btn-primary"
+                invisible="not apply_fine"/>
+    </div>
+</footer>
+            </sheet>
+        </form>
+    </field>
+</record>
+
+<record id="enrolment_sale_order_search_view" model="ir.ui.view">
+        <field name="name">sale.order.search.enrolment</field>
+        <field name="model">sale.order</field>
+        <field name="priority" eval="10"/> 
+        <field name="arch" type="xml">
+            <search string="Student Enrolments">
+                <field name="name" string="Enrolment Ref"
+                       filter_domain="[('name', 'ilike', self)]"/>
+                <field name="partner_id" string="Student/Client"/>
+                <field name="enrolment_status"/> 
+                <field name="user_id" string="Salesperson"/>
+
+                <filter string="Draft Enrolments" name="filter_draft_enrolment"
+                        domain="[('enrolment_status', '=', 'draft')]"/>
+                <filter string="Confirmed Enrolments" name="filter_confirmed_enrolment"
+                        domain="[('enrolment_status', '=', 'confirmed')]"/>
+                <filter string="Withdrawn Enrolments" name="filter_withdrawn_enrolment"
+                        domain="[('enrolment_status', '=', 'withdrawn')]"/>
+                
+                <separator/>
+                
+                <filter string="Today" name="filter_today"
+                        domain="[('date_order', '&gt;=', context_today().strftime('%Y-%m-%d 00:00:00')), ('date_order', '&lt;=', context_today().strftime('%Y-%m-%d 23:59:59'))]"/>
+                <filter string="This Month" name="filter_this_month"
+                        domain="[('date_order', '&gt;=', (context_today() + relativedelta(day=1)).strftime('%Y-%m-%d 00:00:00'))]"/>
+
+                <separator/>
+                
+                <group>
+                    <filter string="Status" name="group_status"
+                            context="{'group_by': 'enrolment_status'}"/>
+
+                </group>
+            </search>
+        </field>
+    </record>
+
+</odoo>

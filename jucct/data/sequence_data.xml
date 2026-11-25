@@ -1,0 +1,9 @@
+<odoo>
+    <record id="seq_academy_program_offering" model="ir.sequence">
+        <field name="name">Academy Program Offering</field>
+        <field name="code">academy.program.offering.sequence</field>
+        <field name="prefix">OFR/</field>
+        <field name="padding">4</field>
+        <field name="implementation">standard</field>
+    </record>
+</odoo>

@@ -1,0 +1,242 @@
+/* ==========================================
+   Jadara Center - Odoo Backend (Simple Version)
+   ========================================== */
+
+:root {
+    --jadara-green: #539273;
+    --jadara-green-hover: #4a8268;
+    --jadara-purple: #2d3267;
+    --jadara-white: #ffffff;
+    
+    --button-primary: #539273;
+    --button-primary-hover: #4a8268;
+    --button-success: #539273;
+    --button-success-hover: #4a8268;
+}
+
+/* ==========================================
+   Header
+   ========================================== */
+.o_main_navbar {
+    background: var(--jadara-green) !important;
+}
+
+
+/* ==========================================
+     Menus in the navbar (Menu Sections) - Same Green
+   ========================================== */
+.o_menu_sections .dropdown-toggle,
+.o_menu_sections button,
+.o_menu_sections .btn {
+    background-color: transparent !important;
+    color: var(--jadara-white) !important;
+    border: none !important;
+}
+
+.o_menu_sections .dropdown-toggle.show,
+.o_menu_sections .dropdown-toggle:hover,
+.o_menu_sections button:hover,
+.o_menu_sections .btn:hover {
+    background-color: var(--jadara-green-hover) !important;
+    color: var(--jadara-white) !important;
+}
+
+/* ==========================================
+   Primary Buttons - Changeable Colors
+   ========================================== */
+.btn-primary,
+.o_form_button_save,
+.o_list_button_save,
+.o_form_button_create {
+    background-color: var(--button-primary) !important;
+    border-color: var(--button-primary) !important;
+    color: var(--jadara-white) !important;
+}
+
+.btn-primary:hover,
+.o_form_button_save:hover,
+.o_list_button_save:hover,
+.o_form_button_create:hover {
+    background-color: var(--button-primary-hover) !important;
+    border-color: var(--button-primary-hover) !important;
+}
+
+/* Success/New buttons */
+.o_list_button_add,
+.btn-success {
+    background-color: var(--button-success) !important;
+    border-color: var(--button-success) !important;
+    color: var(--jadara-white) !important;
+}
+
+.o_list_button_add:hover,
+.btn-success:hover {
+    background-color: var(--button-success-hover) !important;
+    border-color: var(--button-success-hover) !important;
+}
+
+/* ==========================================
+    Status Bar
+   ========================================== */
+.o_statusbar_status .btn-primary,
+.o_statusbar_status .o_arrow_button.btn-primary {
+    background: var(--jadara-green) !important;
+    border-color: var(--jadara-green) !important;
+}
+
+/* ==========================================
+    Notifications and Badges
+   ========================================== */
+.o_mail_systray_item .badge,
+.o_notification_badge,
+.badge-primary {
+    background-color: var(--jadara-green) !important;
+}
+
+/* ==========================================
+   Tabs
+   ========================================== */
+.nav-tabs .nav-link.active {
+    border-bottom: 3px solid var(--jadara-green) !important;
+    color: var(--jadara-purple) !important;
+    font-weight: 600 !important;
+}
+
+/* ==========================================
+   Tables - Row on Scroll
+   ========================================== */
+.o_list_view tbody tr:hover {
+    background-color: rgba(83, 146, 115, 0.08) !important;
+}
+
+.o_list_view tbody tr.o_data_row.o_selected_row {
+    background-color: rgba(83, 146, 115, 0.15) !important;
+}
+
+/* ==========================================
+    Checkboxes
+   ========================================== */
+.custom-checkbox .custom-control-input:checked ~ .custom-control-label::before,
+.o_checkbox input:checked + label::before {
+    background-color: var(--jadara-green) !important;
+    border-color: var(--jadara-green) !important;
+}
+
+/* ==========================================
+    Drop-down lists
+   ========================================== */
+.dropdown-menu {
+    border-top: 3px solid var(--jadara-green) !important;
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+    background-color: rgba(83, 146, 115, 0.1) !important;
+}
+
+/* ==========================================
+    Search
+   ========================================== */
+.o_searchview_input:focus,
+.o_searchview .o_searchview_input_container input:focus {
+    border-color: var(--jadara-green) !important;
+    box-shadow: 0 0 0 0.2rem rgba(83, 146, 115, 0.25) !important;
+}
+
+/* ==========================================
+    Search Panel
+   ========================================== */
+.o_search_panel .o_search_panel_section .list-group-item.active {
+    background-color: var(--jadara-green) !important;
+    border-color: var(--jadara-green) !important;
+}
+
+
+.oe_stat_button i,
+.oe_stat_button .fa {
+    color: var(--jadara-green) !important;
+}
+
+.oe_stat_button .o_stat_value {
+    color:var(--jadara-green) !important;
+}
+
+
+/* ==========================================
+   Action Buttons in Header (Apps, Update, Import)
+   ========================================== */
+
+.o_main_navbar .o_menu_sections .o_nav_entry, .o_main_navbar .o_menu_sections .dropdown-toggle {
+    background: var(--jadara-green) !important;
+    border: 1px solid transparent;
+}
+
+/* ==========================================
+   Breadcrumb
+   ========================================== */
+.breadcrumb {
+    background-color: transparent !important;
+}
+
+.breadcrumb-item a,
+.breadcrumb-item.active {
+    color: var(--jadara-green) !important;
+    font-weight: 500 !important;
+}
+
+.breadcrumb-item a:hover {
+    color: var(--jadara-green-hover) !important;
+    text-decoration: underline !important;
+}
+
+/* Breadcrumb separators */
+.breadcrumb-item + .breadcrumb-item::before {
+    color: var(--jadara-green) !important;
+}
+
+.bg-action, .text-bg-action {
+    background-color: #539273 !important;
+}
+
+
+.o_nav_entry:hover,
+.o_main_navbar .o_menu_sections .dropdown-toggle:hover {
+    background: #458a5f !important;
+    background-color:var(--jadara-green-hover) !important;
+    border-color: #458a5f !important;
+}
+
+.o_main_navbar .o_menu_sections .o_nav_entry,
+.o_main_navbar .o_menu_sections a.o_nav_entry {
+    background-color: #539273 !important;
+    color: #fff !important;
+}
+
+.o_main_navbar .o_menu_sections .o_nav_entry:hover,
+.o_main_navbar .o_menu_sections a.o_nav_entry:hover {
+    background-color: var(--jadara-green-hover) !important;
+    color: #fff !important;
+}
+
+
+/* ==========================================
+    Responsive
+   ========================================== */
+@media (max-width: 768px) {
+    .o_main_navbar .o_menu_brand span::after {
+        content: "جدارا" !important;
+        font-size: 14px !important;
+    }
+    
+    .o_main_navbar .o_menu_brand::before {
+        width: 35px !important;
+        height: 35px !important;
+    }
+}
+
+@media (max-width: 576px) {
+    .o_main_navbar .o_menu_brand span::after {
+        display: none !important;
+    }
+}
+

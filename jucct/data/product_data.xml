@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- ==================== Cron Job to run daily ==================== -->
+    <record id="ir_cron_update_program_status" model="ir.cron">
+        <field name="name">Update Program Status Daily</field>
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="state">code</field>
+        <field name="code">model.cron_update_status()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="active">True</field>
+    </record>
+    <!-- ################################################################ -->
+    <!-- Cron Job to run daily to update Academy Offering Status -->
+    <record id="ir_cron_update_offering_status" model="ir.cron">
+        <field name="name">Update Academy Offering Status</field>
+        <field name="model_id" ref="jucct.model_academy_program_offering"/>
+        <field name="state">code</field>
+        <field name="code">model.cron_update_status()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="active">True</field>
+    </record>
+
+</odoo>

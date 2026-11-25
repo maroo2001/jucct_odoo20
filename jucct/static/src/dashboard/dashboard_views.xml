@@ -1,0 +1,556 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+<t t-name="jucct.Dashboard">
+<div class="o_dashboard d-flex flex-column vh-100">
+    <!-- Filters -->
+    <div class="o_dashboard_top py-2 px-3 border-bottom">
+        <div class="d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center gap-2">
+                <h4 class="mb-0"><t t-translate="true">Educational Dashboard</t></h4>
+                <div class="filter-section">
+                    <div class="filter-group">
+                        <label for="time_range" class="mb-0"><t t-translate="true">Range</t></label>
+                        <select id="time_range" class="form-control form-control-sm" t-model.proxy="this.state.time_range">
+                            <option value="ytd"><t t-translate="true">Year to Date</t></option>
+                            <option value="7d"><t t-translate="true">Last 7 days</t></option>
+                            <option value="30d"><t t-translate="true">Last 30 days</t></option>
+                            <option value="60d"><t t-translate="true">Last 60 days</t></option>
+                            <option value="90d"><t t-translate="true">Last 90 days</t></option>
+                            <option value="180d"><t t-translate="true">Last 180 days</t></option>
+                            <option value="3y"><t t-translate="true">Last 3 years</t></option>
+                            <option value="custom"><t t-translate="true">Custom</t></option>
+                        </select>
+                    </div>
+
+                    <!-- Custom date range -->
+                    <div t-if="this.state.time_range === 'custom'" class="filter-group custom-dates">
+                        <label for="date_start" class="mb-0"><t t-translate="true">From</t></label>
+                        <input type="date" id="date_start" class="form-control form-control-sm" t-model.proxy="this.state.date_range.start"/>
+                        <label for="date_end" class="mb-0"><t t-translate="true">To</t></label>
+                        <input type="date" id="date_end" class="form-control form-control-sm" t-model.proxy="this.state.date_range.end"/>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="academy" class="mb-0"><t t-translate="true">Academy</t></label>
+                        <select id="academy" class="form-control form-control-sm">
+                            <option value="">All</option>
+                            <t t-foreach="this.state.academies" t-as="academy" t-key="academy.id">
+                                <option t-att-value="academy.id"><t t-out="academy.name"/></option>
+                            </t>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="program" class="mb-0"><t t-translate="true">Program</t></label>
+                        <select id="program" class="form-control form-control-sm">
+                            <option value="">All</option>
+                            <t t-foreach="this.state.programs" t-as="program" t-key="program.id">
+                                <option t-att-value="program.id"><t t-out="program.name"/></option>
+                            </t>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="trainer" class="mb-0"><t t-translate="true">Trainer</t></label>
+                        <select id="trainer" class="form-control form-control-sm">
+                            <option value="">All</option>
+                            <t t-foreach="this.state.trainers" t-as="trainer" t-key="trainer.id">
+                                <option t-att-value="trainer.id"><t t-out="trainer.name"/></option>
+                            </t>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="location" class="mb-0"><t t-translate="true">Location</t></label>
+                        <select id="location" class="form-control form-control-sm">
+                            <option value="">All</option>
+                            <t t-foreach="this.state.locations" t-as="loc" t-key="loc.value">
+                                <option t-att-value="loc.value"><t t-out="loc.label"/></option>
+                            </t>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <button type="button" class="btn refresh-btn" t-on-click="() => this.fetchData()">
+                    <i class="oi mr-1" data-icon="sync"/> <t t-translate="true">Refresh</t>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main content with tabs -->
+    <div class="o_dashboard_content flex-fill overflow-auto p-3">
+        <!-- Main Flex Container -->
+        <div class="main-container">
+            <!-- Left Sidebar -->
+              <div class="sidebar-nav">
+                <div class="nav flex-column nav-pills" role="tablist">
+                    <button type="button"
+                            t-att-class="this.state.activeTab == 'financial' ? 'nav-link active mb-2' : 'nav-link mb-2'"
+                            t-on-click="() => this.setTab('financial')">
+                        <i class="oi me-2" data-icon="payments"/><t t-translate="true">Financial</t>
+                    </button>
+                    <button type="button"
+                            t-att-class="this.state.activeTab == 'academic' ? 'nav-link active mb-2' : 'nav-link mb-2'"
+                            t-on-click="() => this.setTab('academic')">
+                        <i class="oi me-2" data-icon="school"/><t t-translate="true">Academic</t>
+                    </button>
+                    <button type="button"
+                            t-att-class="this.state.activeTab == 'student' ? 'nav-link active mb-2' : 'nav-link mb-2'"
+                            t-on-click="() => this.setTab('student')">
+                        <i class="oi me-2" data-icon="group"/><t t-translate="true">Student</t>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Main Content Area - MOVED INSIDE FLEX CONTAINER -->
+            <div class="content-area">
+                <!-- Tab Content -->
+                <div class="tab-content">
+                    <!-- Academic Overview Tab -->
+                    <div t-att-class="this.state.activeTab == 'academic' ? 'tab-pane active' : 'tab-pane d-none'">
+                        <div class="dashboard-tab-content">
+                            <!-- KPI Section -->
+                            <div class="kpi-section mb-3">
+                                <h5 class="section-title mb-2"><t t-translate="true">Key Metrics</t></h5>
+                                <div class="stats-grid expanded">
+                                    <div class="stat-box large" t-on-click="() => this.openDrillDown('total_active_programs')">
+                                        <div class="stat-value"><t t-out="this.state.academic_overview.total_active_programs"/></div>
+                                        <div class="stat-label"><t t-translate="true">Active Programs</t></div>
+                                    </div>
+                                    <div class="stat-box large" t-on-click="() => this.openDrillDown('total_active_courses')">
+                                        <div class="stat-value"><t t-out="this.state.academic_overview.total_active_courses"/></div>
+                                        <div class="stat-label"><t t-translate="true">Active Courses</t></div>
+                                    </div>
+                                    <div class="stat-box large" t-on-click="() => this.openDrillDown('total_active_diplomas')">
+                                        <div class="stat-value"><t t-out="this.state.academic_overview.total_active_diplomas"/></div>
+                                        <div class="stat-label"><t t-translate="true">Active Diplomas</t></div>
+                                    </div>
+                                    <div class="stat-box large" t-on-click="() => this.openDrillDown('upcoming_sessions')">
+                                        <div class="stat-value"><t t-out="this.state.academic_overview.upcoming_sessions"/></div>
+                                        <div class="stat-label"><t t-translate="true">Upcoming Sessions</t></div>
+                                    </div>
+                                    <div class="stat-box large" t-on-click="() => this.openDrillDown('total_active_academies')">
+                                        <div class="stat-value"><t t-out="this.state.academies_overview.total_active_academies"/></div>
+                                        <div class="stat-label"><t t-translate="true">Active Academies</t></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Two-column row: charts (tabbed) + top-5 lists -->
+                            <div class="row g-3">
+                                <div class="col-lg-6">
+                                    <div class="card h-100">
+                                        <div class="card-header">
+                                            <ul class="nav nav-tabs card-header-tabs" role="tablist">
+                                                <li class="nav-item">
+                                                    <a class="nav-link active" data-bs-toggle="tab" href="#acad_chart1" role="tab"><t t-translate="true">Academy/Programs</t></a>
+                                                </li>
+                                                <li class="nav-item">
+                                                    <a class="nav-link" data-bs-toggle="tab" href="#acad_chart2" role="tab"><t t-translate="true">Trainer/Programs</t></a>
+                                                </li>
+                                                <li class="nav-item">
+                                                    <a class="nav-link" data-bs-toggle="tab" href="#acad_chart3" role="tab"><t t-translate="true">Location/Programs</t></a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="tab-content">
+                                                <div class="tab-pane fade show active" id="acad_chart1" role="tabpanel">
+                                                    <div class="chart-container-medium">
+                                                        <canvas t-ref="this.academyCoursesChartRef"></canvas>
+                                                    </div>
+                                                </div>
+                                                <div class="tab-pane fade" id="acad_chart2" role="tabpanel">
+                                                    <div class="chart-container-medium">
+                                                        <canvas t-ref="this.trainerCoursesChartRef"></canvas>
+                                                    </div>
+                                                </div>
+                                                <div class="tab-pane fade" id="acad_chart3" role="tabpanel">
+                                                    <div class="chart-container-medium">
+                                                        <canvas t-ref="this.locationCoursesChartRef"></canvas>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="card h-100">
+                                        <div class="card-header"><t t-translate="true">Top by Offerings</t></div>
+                                        <div class="card-body p-2">
+                                            <!-- Stacked lists that use available space (full-width per list) -->
+                                            <div class="row small">
+                                                <div class="col-12 col-mb-4">
+                                                    <strong><t t-translate="true">Academies</t></strong>
+                                                    <ul class="list-unstyled mb-0">
+                                                        <t t-foreach="((this.state.academies_overview.top_5_by_offering and this.state.academies_overview.top_5_by_offering.academies) || [])" t-as="it" t-key="it.id">
+                                                            <li class="d-flex justify-content-between align-items-center py-1" t-on-click="() => this.openRecordWithDomain('academy.program.offering', [['academy_id', '=', it.id],['status', '=', 'active']], {'group_by' : 'program_id'})">
+                                                                <a href="#" class="me-2">
+                                                                    <t t-out="it.name"/>
+                                                                </a>
+                                                                <a href="#" class="text-muted small"  title="Show offerings for this academy">
+                                                                    <t t-translate="true">Offerings:</t> <t t-out="it.num_offerings"/> · <t t-translate="true">Programs:</t> <t t-out="it.num_distinct_programs"/>
+                                                                </a>
+                                                            </li>
+                                                        </t>
+                                                    </ul>
+                                                </div>
+
+                                                <div class="col-12 col-mb-4">
+                                                    <strong><t t-translate="true">Locations</t></strong>
+                                                    <ul class="list-unstyled mb-0">
+                                                        <t t-foreach="((this.state.academies_overview.top_5_by_offering and this.state.academies_overview.top_5_by_offering.locations) || [])" t-as="it" t-key="it.name">
+                                                            <li class="d-flex justify-content-between align-items-center py-1" t-on-click="() => this.openRecordWithDomain('academy.program.offering', [['program_id.venue', '=', it.name],['status', '=', 'active']], {'group_by' : 'program_id'})">
+                                                                <a href="#" class="me-2">
+                                                                    <t t-out="it.name"/>
+                                                                </a>
+                                                                <a href="#" class="text-muted small"  title="Show offerings at this location">
+                                                                    <t t-translate="true">Offerings:</t> <t t-out="it.num_offerings"/> · <t t-translate="true">Programs:</t> <t t-out="it.num_distinct_programs"/>
+                                                                </a>
+                                                            </li>
+                                                        </t>
+                                                    </ul>
+                                                </div>
+
+                                                <div class="col-12 col-mb-4">
+                                                    <strong><t t-translate="true">Trainers</t></strong>
+                                                    <ul class="list-unstyled mb-0">
+                                                        <t t-foreach="((this.state.academies_overview.top_5_by_offering and this.state.academies_overview.top_5_by_offering.trainers) || [])" t-as="it" t-key="it.id">
+                                                            <li class="d-flex justify-content-between align-items-center py-1" t-on-click="() => this.openRecordWithDomain('academy.program.offering', [['session_ids.trainer_id', '=', it.id],['status', '=', 'active']], {'group_by' : 'program_id'})">
+                                                                <a href="#" class="me-2">
+                                                                    <t t-out="it.name"/>
+                                                                </a>
+                                                                <a href="#" class="text-muted small"  title="Show offerings for this trainer">
+                                                                    <t t-translate="true">Offerings:</t> <t t-out="it.num_offerings"/> · <t t-translate="true">Programs:</t> <t t-out="it.num_distinct_programs"/>
+                                                                </a>
+                                                            </li>
+                                                        </t>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Student Overview Tab -->
+                    <div t-att-class="this.state.activeTab == 'student' ? 'tab-pane active' : 'tab-pane d-none'">
+                        <div class="dashboard-tab-content">
+                            <!-- KPI Section -->
+                            <div class="kpi-section mb-3">
+                                <h5 class="section-title mb-2">Key Metrics</h5>
+                                <div class="stats-grid expanded">
+                                    <div class="stat-box large" t-on-click="() => this.openDrillDown('total_students')">
+                                        <div class="stat-value"><t t-out="this.state.student_overview.total_students"/></div>
+                                        <div class="stat-label">Total Students</div>
+                                    </div>
+                                    <div class="stat-box large" t-on-click="() => this.openDrillDown('new_registrations')">
+                                        <div class="stat-value"><t t-out="this.state.student_overview.new_registrations"/></div>
+                                        <div class="stat-label">New Registrations</div>
+                                    </div>
+                                    <div class="stat-box large" t-on-click="() => this.openDrillDown('withdrawn_students')">
+                                        <div class="stat-value"><t t-out="this.state.student_overview.withdrawn_students"/></div>
+                                        <div class="stat-label">Withdrawn</div>
+                                    </div>
+                                    <div class="stat-box large" t-on-click="() => this.openDrillDown('completed_programs')">
+                                        <div class="stat-value"><t t-out="this.state.student_overview.completed_programs"/></div>
+                                        <div class="stat-label">Completed Programs</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Two-column row: charts (tabbed) + top-5 lists -->
+                            <div class="row g-3">
+                                <div class="col-lg-6">
+                                    <div class="card h-100">
+                                        <div class="card-header">
+                                            <ul class="nav nav-tabs card-header-tabs" role="tablist">
+                                                <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#stu_ch1" role="tab">Top Academies</a></li>
+                                                <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#stu_ch2" role="tab">Trends</a></li>
+                                            </ul>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="tab-content">
+                                                <div class="tab-pane fade show active" id="stu_ch1" role="tabpanel">
+                                                    <div class="chart-container-medium"><canvas t-ref="this.topAcademiesChartRef"></canvas></div>
+                                                </div>
+                                                <div class="tab-pane fade" id="stu_ch2" role="tabpanel">
+                                                    <div class="chart-container-medium"><canvas t-ref="this.trendsChartRef"></canvas></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="card h-100">
+                                        <div class="card-header">Top 5 by Number of Students</div>
+                                        <div class="card-body p-2">
+                                            <div class="row small">
+                                                    <div class="col-12 col-md-4">
+                                                    <strong>Academies</strong>
+                                                    <ul class="list-unstyled mb-2">
+                                                        <t t-foreach="(this.state.student_overview.top_5_academies || [])" t-as="it" t-key="'sa-' + (it.id || it.name)">
+                                                            <li class="d-flex justify-content-between" t-on-click="() => this.openRecordWithDomain('res.partner', [['id', 'in', it.student_ids]],{'form_view_ref': 'jucct.student_jucct_form_view', 'default_edu_type': 'student', 'list_view_ref': 'jucct.student_jucct_list_view'})">
+                                                                <span t-out="it.name"/>
+                                                                <span class="text-muted" t-out="it.value"/>
+                                                            </li>
+                                                        </t>
+                                                    </ul>
+                                                </div>
+                                                <div class="col-12 col-md-4">
+                                                    <strong>Courses</strong>
+                                                    <ul class="list-unstyled mb-2">
+                                                        <t t-foreach="(this.state.student_overview.top_5_courses || [])" t-as="it" t-key="'sc-' + (it.id || it.name)">
+                                                            <li class="d-flex justify-content-between" t-on-click="() => this.openRecordWithDomain('res.partner',[['id', 'in', it.student_ids]],{'form_view_ref': 'jucct.student_jucct_form_view', 'default_edu_type': 'student', 'list_view_ref': 'jucct.student_jucct_list_view'})">
+                                                                <span t-out="it.name"/>
+                                                                <span class="text-muted" t-out="it.value"/>
+                                                            </li>
+                                                        </t>
+                                                    </ul>
+                                                </div>
+                                                <div class="col-12 col-md-4">
+                                                    <strong>Diplomas</strong>
+                                                    <ul class="list-unstyled mb-2">
+                                                        <t t-foreach="(this.state.student_overview.top_5_diplomas || [])" t-as="it" t-key="'sd-' + (it.id || it.name)">
+                                                            <li class="d-flex justify-content-between" t-on-click="() => this.openRecordWithDomain('res.partner',[['id', 'in', it.student_ids]],{'form_view_ref': 'jucct.student_jucct_form_view', 'default_edu_type': 'student', 'list_view_ref': 'jucct.student_jucct_list_view'})">
+                                                                <span t-out="it.name"/>
+                                                                <span class="text-muted" t-out="it.value"/>
+                                                            </li>
+                                                        </t>
+                                                    </ul>
+                                                </div>
+                                                <div class="col-12 col-md-4">
+                                                    <strong>Locations</strong>
+                                                    <ul class="list-unstyled mb-2">
+                                                        <t t-foreach="(this.state.student_overview.top_5_locations || [])" t-as="it" t-key="'sl-' + (it.id || it.name)">
+                                                            <li class="d-flex justify-content-between" t-on-click="() => this.openRecordWithDomain('res.partner', [['id', 'in', it.student_ids]],{'form_view_ref': 'jucct.student_jucct_form_view', 'default_edu_type': 'student', 'list_view_ref': 'jucct.student_jucct_list_view'})">
+                                                                <span t-out="it.name"/>
+                                                                <span class="text-muted" t-out="it.value"/>
+                                                            </li>
+                                                        </t>
+                                                    </ul>
+                                                </div>
+                                                <div class="col-12 col-md-4">
+                                                    <strong>Trainers</strong>
+                                                    <ul class="list-unstyled mb-0">
+                                                        <t t-foreach="(this.state.student_overview.top_5_trainers || [])" t-as="it" t-key="'st-' + (it.id || it.name)">
+                                                            <li class="d-flex justify-content-between" t-on-click="() => this.openRecordWithDomain('res.partner', [['id', 'in', it.student_ids]],{'form_view_ref': 'jucct.student_jucct_form_view', 'default_edu_type': 'student', 'list_view_ref': 'jucct.student_jucct_list_view'})">
+                                                                <span t-out="it.name"/>
+                                                                <span class="text-muted" t-out="it.value"/>
+                                                            </li>
+                                                        </t>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Financial Overview Tab -->
+                    <div t-att-class="this.state.activeTab == 'financial' ? 'tab-pane active' : 'tab-pane d-none'">
+                        <div class="dashboard-tab-content">
+                            <!-- KPI Section -->
+                            <div class="kpi-section mb-3">
+                                <h5 class="section-title mb-2">Key Metrics</h5>
+                                <div class="stats-grid expanded">
+                                    <div class="stat-box large" t-on-click="() => this.openDrillDown('total_invoices')">
+                                        <div class="stat-value"><t t-out="this.state.financial_overview.total"/><t t-out="this.state.financial_overview.currency"/></div>
+                                        <div class="stat-label">in <t t-out="this.state.financial_overview.total_invoices"/> Invoices</div>
+                                    </div>
+                                    <div class="stat-box large" t-on-click="() => this.openDrillDown('paid_invoices')">
+                                        <div class="stat-value"><t t-out="this.state.financial_overview.total_collected"/><t t-out="this.state.financial_overview.currency"/></div>
+                                        <div class="stat-label">paid</div>
+                                    </div>
+                                    <div class="stat-box large" t-on-click="() => this.openDrillDown('unpaid_invoices')">
+                                        <div class="stat-value"><t t-out="this.state.financial_overview.total_unpaid"/><t t-out="this.state.financial_overview.currency"/></div>
+                                        <div class="stat-label">Unpaid</div>
+                                    </div>
+                                    <div class="stat-box large" t-on-click="() => this.openDrillDown('paid_settlements')">
+                                        <div class="stat-value"><t t-out="this.state.financial_overview.total_paid_settlements"/><t t-out="this.state.financial_overview.currency"/></div>
+                                        <div class="stat-label">in <t t-out="this.state.financial_overview.paid_settlements"/> Settlements</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Two-column row: charts (tabbed) + top-5 lists -->
+                            <div class="row g-3">
+                                <div class="col-lg-6">
+                                    <div class="card h-100">
+                                        <div class="card-header">
+                                            <ul class="nav nav-tabs card-header-tabs" role="tablist">
+                                                <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#fin_ch1" role="tab">Monthly Revenue</a></li>
+                                                <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#fin_ch2" role="tab"><t t-translate="true">center vs academy Revenue</t></a></li>
+                                                <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#acad_ch1" role="tab">academy Revenue</a></li>
+                                                <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#acad_ch3" role="tab">Paid vs Unpaid</a></li>
+                                            </ul>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="tab-content">
+                                                <div class="tab-pane fade show active" id="fin_ch1" role="tabpanel">
+                                                    <div class="chart-container-medium"><canvas t-ref="this.financialRevenueChartRef"></canvas></div>
+                                                </div>
+                                                <div class="tab-pane fade" id="fin_ch2" role="tabpanel">
+                                                    <div class="chart-container-medium"><canvas t-ref="this.revenueSettlementsChartRef"></canvas></div>
+                                                </div>
+                                                <div class="tab-pane fade" id="acad_ch1" role="tabpanel">
+                                                    <div class="chart-container-medium"><canvas t-ref="this.academyRevenueChartRef"></canvas></div>
+                                                </div>
+                                                <div class="tab-pane fade" id="acad_ch3" role="tabpanel">
+                                                    <div class="chart-container-medium"><canvas t-ref="this.paidUnpaidChartRef"></canvas></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="card h-100">
+                                        <div class="card-header">
+                                            <ul class="nav nav-tabs card-header-tabs" role="tablist">
+                                                <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#fin_top_center" role="tab">Top 5 by Center revenue</a></li>
+                                                <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#fin_top_academy" role="tab">Top 5 by Academy revenue</a></li>
+                                            </ul>
+                                        </div>
+                                        <div class="card-body p-2">
+                                            <div class="tab-content">
+                                                <div class="tab-pane fade show active" id="fin_top_center" role="tabpanel">
+                                                    <div class="row small">
+                                                        <div class="col-12 col-md-3">
+                                                            <strong>Academies</strong>
+                                                            <ul class="list-unstyled mb-0">
+                                                                <t t-foreach="(this.state.financial_overview.top_5_academies || [])" t-as="it" t-key="'fa-' + (it.id || it.name)">
+                                                                    <li class="d-flex justify-content-between" t-on-click="() => this.openRecordWithDomain('academy.financial.settlement', [['academy_id', '=', it.id],['settlement_status', '=', 'paid']],{'group_by' : 'program_id' })">
+                                                                        <span t-out="it.name"/>
+                                                                        <span class="text-muted" t-out="it.value"/>
+                                                                    </li>
+                                                                </t>
+                                                            </ul>
+                                                        </div>
+                                                        <div class="col-12 col-md-3">
+                                                            <strong>Courses</strong>
+                                                            <ul class="list-unstyled mb-0">
+                                                                <t t-foreach="(this.state.financial_overview.top_5_courses || [])" t-as="it" t-key="'fc-' + (it.id || it.name)">
+                                                                    <li class="d-flex justify-content-between" t-on-click="() => this.openRecordWithDomain('academy.financial.settlement', [['program_id', '=', it.id],['settlement_status', '=', 'paid']],{'group_by' : 'academy_id' })">
+                                                                        <span t-out="it.name"/>
+                                                                        <span class="text-muted" t-out="it.value"/>
+                                                                    </li>
+                                                                </t>
+                                                            </ul>
+                                                        </div>
+                                                        <div class="col-12 col-md-3">
+                                                            <strong>Diplomas</strong>
+                                                            <ul class="list-unstyled mb-0">
+                                                                <t t-foreach="(this.state.financial_overview.top_5_diplomas || [])" t-as="it" t-key="'fd-' + (it.id || it.name)">
+                                                                    <li class="d-flex justify-content-between" t-on-click="() => this.openRecordWithDomain('academy.financial.settlement', [['program_id', '=', it.id],['settlement_status', '=', 'paid']],{'group_by' : 'academy_id' })">
+                                                                        <span t-out="it.name"/>
+                                                                        <span class="text-muted" t-out="it.value"/>
+                                                                    </li>
+                                                                </t>
+                                                            </ul>
+                                                        </div>
+                                                        <div class="col-12 col-md-3">
+                                                            <strong>Locations</strong>
+                                                            <ul class="list-unstyled mb-0">
+                                                                <t t-foreach="(this.state.financial_overview.top_5_locations || [])" t-as="it" t-key="'fl-' + (it.id || it.name)">
+                                                                    <li class="d-flex justify-content-between" t-on-click="() => this.openRecordWithDomain('academy.financial.settlement', [['program_id.venue', '=', it.name],['settlement_status', '=', 'paid']],{'group_by' : 'program_id' })">
+                                                                        <span t-out="it.label"/>
+                                                                        <span class="text-muted" t-out="it.value"/>
+                                                                    </li>
+                                                                </t>
+                                                            </ul>
+                                                        </div>
+                                                        <div class="col-12 col-md-3">
+                                                            <strong>Trainers</strong>
+                                                            <ul class="list-unstyled mb-0">
+                                                                <t t-foreach="(this.state.financial_overview.top_5_trainers || [])" t-as="it" t-key="'ft-' + (it.id || it.name)">
+                                                                    <li class="d-flex justify-content-between" t-on-click="() => this.openRecordWithDomain('academy.financial.settlement', [['program_id.session_ids.offering_trainer_ids', '=', it.name],['settlement_status', '=', 'paid']],{'group_by' : 'program_id' })">
+                                                                        <span t-out="it.name"/>
+                                                                        <span class="text-muted" t-out="it.value"/>
+                                                                    </li>
+                                                                </t>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="tab-pane fade" id="fin_top_academy" role="tabpanel">
+                                                    <div class="row small">
+                                                        <div class="col-12 col-md-3">
+                                                            <strong>Academies</strong>
+                                                            <ul class="list-unstyled mb-0">
+                                                                <t t-foreach="(this.state.academic_overview.top_5_academies || [])" t-as="it" t-key="'aa-' + (it.id || it.name)">
+                                                                    <li class="d-flex justify-content-between" t-on-click="() => this.openRecordWithDomain('academy.financial.settlement', [['academy_id', '=', it.id],['settlement_status', '=', 'paid']],{'group_by' : 'program_id' })">
+                                                                        <span t-out="it.name"/>
+                                                                        <span class="text-muted" t-out="it.value"/>
+                                                                    </li>
+                                                                </t>
+                                                            </ul>
+                                                        </div>
+                                                        <div class="col-12 col-md-3">
+                                                            <strong>Courses</strong>
+                                                            <ul class="list-unstyled mb-0">
+                                                                <t t-foreach="(this.state.academic_overview.top_5_courses || [])" t-as="it" t-key="'ac-' + (it.id || it.name)">
+                                                                    <li class="d-flex justify-content-between" t-on-click="() => this.openRecordWithDomain('academy.financial.settlement', [['program_id', '=', it.id],['settlement_status', '=', 'paid']],{'group_by' : 'academy_id' })">
+                                                                        <span t-out="it.name"/>
+                                                                        <span class="text-muted" t-out="it.value"/>
+                                                                    </li>
+                                                                </t>
+                                                            </ul>
+                                                        </div>
+                                                        <div class="col-12 col-md-3">
+                                                            <strong>Diplomas</strong>
+                                                            <ul class="list-unstyled mb-0">
+                                                                <t t-foreach="(this.state.academic_overview.top_5_diplomas || [])" t-as="it" t-key="'ad-' + (it.id || it.name)">
+                                                                    <li class="d-flex justify-content-between" t-on-click="() => this.openRecordWithDomain('academy.financial.settlement', [['program_id', '=', it.id],['settlement_status', '=', 'paid']],{'group_by' : 'academy_id' })">
+                                                                        <span t-out="it.name"/>
+                                                                        <span class="text-muted" t-out="it.value"/>
+                                                                    </li>
+                                                                </t>
+                                                            </ul>
+                                                        </div>
+                                                        <div class="col-12 col-md-3">
+                                                            <strong>Locations</strong>
+                                                            <ul class="list-unstyled mb-0">
+                                                                <t t-foreach="(this.state.academic_overview.top_5_locations || [])" t-as="it" t-key="'al-' + (it.id || it.name)">
+                                                                    <li class="d-flex justify-content-between" t-on-click="() => this.openRecordWithDomain('academy.financial.settlement', [['program_id.venue', '=', it.name],['settlement_status', '=', 'paid']],{'group_by' : 'program_id' })">
+                                                                        <span t-out="it.label"/>
+                                                                        <span class="text-muted" t-out="it.value"/>
+                                                                    </li>
+                                                                </t>
+                                                            </ul>
+                                                        </div>
+                                                        <div class="col-12 col-md-3">
+                                                            <strong>Trainers</strong>
+                                                            <ul class="list-unstyled mb-0">
+                                                                <t t-foreach="(this.state.academic_overview.top_5_trainers || [])" t-as="it" t-key="'at-' + (it.id || it.name)">
+                                                                    <li class="d-flex justify-content-between" t-on-click="() => this.openRecordWithDomain('academy.financial.settlement', [['program_id.session_ids.offering_trainer_ids', '=', it.name],['settlement_status', '=', 'paid']],{'group_by' : 'program_id' })">
+                                                                        <span t-out="it.name"/>
+                                                                        <span class="text-muted" t-out="it.value"/>
+                                                                    </li>
+                                                                </t>
+                                                            </ul>
+                                                       
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+                    
+                </div> <!-- /.tab-content -->
+            </div> <!-- /.flex-grow-1 -->
+        </div> <!-- /.d-flex -->
+    </div> <!-- /.o_dashboard_content -->
+</div> <!-- /.o_dashboard -->
+</t>
+</templates>
+

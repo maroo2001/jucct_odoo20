@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+ 
+    <!-- ==================== Educational Program Actions ==================== -->
+<record id="educational_courses_jucct_action" model="ir.actions.act_window">
+    <field name="name">Courses</field>
+    <field name="res_model">product.template</field>
+    <field name="view_mode">list,form</field>
+    <field name="view_id" ref="educational_jucct_list_view"/>
+    <field name="domain">[('program_type', '=', 'course')]</field>
+    <field name="context">
+        {'default_program_type': 'course',
+         'default_is_program': True,
+         'form_view_ref': 'jucct.educational_jucct_form_view'}
+    </field>
+    <field name="group_ids" eval="[(6, 0, [ref('jucct.group_course_offering_rw')])]"/>
+</record>
+
+<record id="educational_diplomas_jucct_action" model="ir.actions.act_window">
+    <field name="name">Diplomas</field>
+    <field name="res_model">product.template</field>
+    <field name="view_mode">list,form</field>
+    <field name="view_id" ref="educational_jucct_list_view"/>
+    <field name="domain">[('program_type', '=', 'diploma')]</field>
+    <field name="context">
+        {'default_program_type': 'diploma',
+         'default_is_program': True,
+         'form_view_ref': 'jucct.educational_jucct_form_view'}
+    </field>
+    <field name="group_ids" eval="[(6, 0, [ref('jucct.group_course_offering_rw')])]"/>
+</record>
+
+<!--  Students Action  -->
+<record id="students_only_jucct_action" model="ir.actions.act_window">
+    <field name="name">Students</field>
+    <field name="res_model">res.partner</field>
+    <field name="view_mode">list,form</field>
+    <field name="view_id" ref="student_jucct_list_view"/>
+    <field name="search_view_id" ref="student_jucct_search_view"/>
+    <field name="domain">[('edu_type', '=', 'student')]</field>
+    <field name="context" eval="{'form_view_ref': 'jucct.student_jucct_form_view', 'default_edu_type': 'student', 'default_invoice_template_pdf_report_id' :  ref('jucct.enrollment_invoice_report') }"/>
+</record>
+<record id="students_only_jucct_action1" model="ir.actions.act_window">
+    <field name="name">Students</field>
+    <field name="res_model">res.partner</field>
+    <field name="view_mode">list,form</field>
+    <field name="view_id" ref="student_jucct_list_view"/>
+    <field name="search_view_id" ref="student_jucct_search_view"/>
+    <field name="domain">[('edu_type', '=', 'student')]</field>
+    <field name="context" eval="{'create' : 0,'edit' : False,'form_view_ref': 'jucct.student_jucct_form_view', 'default_edu_type': 'student', 'default_invoice_template_pdf_report_id' :  ref('jucct.enrollment_invoice_report') }"/>
+</record>
+<!--  Academies Action  -->
+<record id="academies_only_jucct_action" model="ir.actions.act_window">
+    <field name="name">Academies</field>
+    <field name="res_model">res.partner</field>
+    <field name="view_mode">list,form</field>
+    <field name="view_id" ref="academy_jucct_list_view"/>
+    <field name="search_view_id" ref="academy_jucct_search_view"/>
+    <field name="group_ids" eval="[(6, 0, [ref('jucct.group_academy_trainer_rw'), ref('jucct.group_academy_trainer_contract'), ref('base.group_system')])]"/>
+    <field name="domain">[('edu_type', '=', 'academy')]</field>
+    <field name="context">{'create' : 1,'form_view_ref': 'jucct.academy_jucct_form_view', 'default_company_type': 'company', 'default_edu_type': 'academy'}</field>
+</record>
+<record id="academies_only_jucct_action1" model="ir.actions.act_window">
+    <field name="name">Academies</field>
+    <field name="res_model">res.partner</field>
+    <field name="view_mode">list,form</field>
+    <field name="view_id" ref="academy_jucct_list_view"/>
+    <field name="search_view_id" ref="academy_jucct_search_view"/>
+    <field name="domain">[('edu_type', '=', 'academy')]</field>
+    <field name="context">{'create' : 0,'edit' : False, 'form_view_ref': 'jucct.academy_jucct_form_view', 'default_company_type': 'company', 'default_edu_type': 'academy'}</field>
+</record>
+     <!-- Action Payment Terms -->
+    <record id="educational_payment_terms_jucct_action" model="ir.actions.act_window">
+        <field name="name">Payment Rules</field>
+        <field name="res_model">account.payment.term</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{}</field>
+    </record>
+
+
+    <!-- Action for Customer Invoices -->
+   <record id="educational_customer_invoices_jucct_action" model="ir.actions.act_window">
+    <field name="name">Invoices</field>  
+    <field name="res_model">account.move</field>  
+    <field name="view_mode">list,form</field> 
+    <field name="domain">[('is_enrollment', '=', 'True')]</field>
+    <field name="context">{'create': False}</field>
+</record>
+
+<!-- ====enrolment sales order actions and links-->
+<record id="enrollment_jucct_action" model="ir.actions.act_window">
+    <field name="name">Student Enrollments</field>
+    <field name="res_model">sale.order</field>
+    <field name="view_mode">list,form</field>
+    <field name="views" eval="[(ref('enrollment_jucct_list_view'), 'list'), (ref('jucct.enrollment_jucct_form_view'), 'form')]"/>
+    <field name="context">{'enrolment_mode' : True ,'form_view_ref': 'jucct.enrollment_jucct_form_view','default_type': 'sale','default_is_enrolment' : True }</field>
+    <field name="domain">[('is_enrolment', '=', 'True' )]</field>
+</record>
+<record id="course_enrollment_jucct_action" model="ir.actions.act_window">
+    <field name="name">Student Enrollments</field>
+    <field name="res_model">sale.order</field>
+    <field name="view_mode">list,form</field>
+    <field name="views" eval="[(ref('enrollment_jucct_list_view'), 'list'), (ref('jucct.enrollment_jucct_form_view'), 'form')]"/>
+    <field name="context" eval="{'enrolment_mode' : True ,'form_view_ref': 'jucct.enrollment_jucct_form_view','default_type': 'sale','default_is_enrolment' : True , 'default_program_type' : 'course', 'default_payment_term_id' : ref('jucct.payment_term_10_percent_monthly')}"/>
+    <field name="domain">[('is_enrolment', '=', 'True' ),('program_type','=','course')]</field>
+</record>
+<record id="diploma_enrollment_jucct_action" model="ir.actions.act_window">
+    <field name="name">Student Enrollments</field>
+    <field name="res_model">sale.order</field>
+    <field name="view_mode">list,form</field>
+    <field name="views" eval="[(ref('enrollment_jucct_list_view'), 'list'), (ref('jucct.enrollment_jucct_form_view'), 'form')]"/>
+    <field name="context" eval= "{'enrolment_mode' : True ,'form_view_ref': 'jucct.enrollment_jucct_form_view','default_type': 'sale','default_is_enrolment' : True , 'default_program_type' : 'diploma', 'default_payment_term_id' : ref('jucct.payment_term_10_percent_monthly') }"/>
+    <field name="domain">[('is_enrolment', '=', 'True' ),('program_type','=','diploma')]</field>
+</record>
+
+ <!-- ################################################################ -->
+    <!-- Trainer Action - Full Access -->
+    <record id="trainer_jucct_action" model="ir.actions.act_window">
+        <field name="name">Trainers</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="trainer_jucct_list_view"/>
+        <field name="domain">[('is_trainer','=',True)]</field>
+        <field name="group_ids" eval="[(4, ref('jucct.group_academy_trainer_rw')),(4, ref('jucct.group_academy_trainer_contract')),(4, ref('base.group_system'))]"/>
+        <field name="context">{
+            'form_view_ref': 'jucct.trainer_jucct_form_view',
+            'default_is_trainer': True,
+            'active_test': False,
+            'search_default_filter_active': 1
+        }</field>
+
+
+        <field name="search_view_id" ref="trainer_jucct_search_view"/>
+    </record>
+
+    <!-- Trainer Action - Read Only -->
+    <record id="trainer_jucct_action1" model="ir.actions.act_window">
+        <field name="name">Trainers</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="trainer_jucct_list_view"/>
+        <field name="domain">[('is_trainer','=',True)]</field>
+        <field name="context">{
+            'create': 0,
+            'edit': False,
+            'no_open': True,
+            'form_view_ref': 'jucct.trainer_jucct_form_view',
+            'default_is_trainer': True,
+            'active_test': False,
+            'search_default_filter_active': 1
+        }</field>
+
+
+        <field name="search_view_id" ref="trainer_jucct_search_view"/>
+    </record>
+
+
+     <!-- Certification Action -->
+    <record id="trainer_certification_jucct_action" model="ir.actions.act_window">
+        <field name="name">Certifications</field>
+        <field name="res_model">trainer.certification</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_filter_active': 1}</field>
+    </record>
+
+
+    <record id="academy_offerings_jucct_action" model="ir.actions.act_window">
+    <field name="name">Academy Offerings</field>
+    <field name="res_model">academy.program.offering</field>
+    <field name="view_mode">list,form</field>
+    <field name="context">{'group_by': ['academy_id']}</field>
+    </record>
+
+    <!-- ==================== Action for session ==================== -->
+    <record id="academy_session_jucct_action" model="ir.actions.act_window">
+        <field name="name">Sessions</field>
+        <field name="res_model">academy.session</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_academy_session_jucct_search"/>
+        <field name="context">{'group_by': ['program_id', 'academy_id', 'offering_id']}</field>
+        <field name="domain">[('record_type', '!=', 'scheduled')]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first Session
+            </p>
+        </field>
+    </record>
+
+    <!-- Actions -->
+    <record id="academy_settlement_jucct_action" model="ir.actions.act_window">
+     <field name="name">Financial Settlements</field>
+<field name="res_model">academy.financial.settlement</field>
+<field name="view_mode">list,form</field>
+<field name="domain">[('is_center_settlement', '=', 0)]</field>
+ <field name="help" type="html">
+ <p class="o_view_nocontent_smiling_face">
+ Create a new financial settlement.</p>
+ </field>
+ <field name="search_view_id" ref="view_academy_financial_settlement_search"/>
+</record>
+
+    <record id="student_payment_jucct_action" model="ir.actions.act_window">
+        <field name="name">Student Payments</field>
+        <field name="res_model">academy.student.payment</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- ==================== Mass Session Actions ==================== -->
+    <record id="mass_schedule_sessions_jucct_action" model="ir.actions.server">
+        <field name="name">Schedule Sessions</field>
+        <field name="model_id" ref="model_academy_session"/>
+        <field name="binding_model_id" ref="model_academy_session"/>
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
+        <field name="code">
+            if records:
+                action = records.action_mass_schedule()
+        </field>
+    </record>
+
+    <record id="mass_mark_done_sessions_jucct_action" model="ir.actions.server">
+        <field name="name">Mark as Done</field>
+        <field name="model_id" ref="model_academy_session"/>
+        <field name="binding_model_id" ref="model_academy_session"/>
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
+        <field name="code">
+            if records:
+                action = records.action_mass_mark_done()
+        </field>
+    </record>
+
+    <record id="mass_cancel_sessions_jucct_action" model="ir.actions.server">
+        <field name="name">Cancel Sessions</field>
+        <field name="model_id" ref="model_academy_session"/>
+        <field name="binding_model_id" ref="model_academy_session"/>
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
+        <field name="code">
+            if records:
+                action = records.action_mass_cancel()
+        </field>
+    </record>
+
+    <record id="educational_dashboard_jucct_action" model="ir.actions.client">
+        <field name="name">Dashboard</field>
+        <field name="tag">jucct.educational_dashboard</field>
+    </record>
+    <record id="action_edu_user" model="ir.actions.act_window">
+        <field name="name">Education Users</field>
+        <field name="res_model">edu.user</field>
+        <field name="view_mode">list,form</field>
+    </record>
+    <record id="educational_customer_invoices_jucct_action" model="ir.actions.act_window">
+    <field name="name">Enrollment Invoices</field>
+    <field name="res_model">account.move</field>
+    <field name="view_mode">list,form</field>
+    <field name="view_id" ref="view_move_list_inherit_program_fields"/>
+    <field name="domain">[('is_enrollment','=',True)]</field>
+    <field name="context">{'default_is_enrollment': True}</field>
+    <field name="search_view_id" ref="educational_invoice_search_view"/> 
+</record>
+
+
+        <!-- ############################ reoprt #############################-->
+    <record id="educational_report_students_jucct_action" model="ir.actions.act_window">
+        <field name="name">Student Enrollment Analysis</field>
+        <field name="res_model">educational.student.report</field>
+        <field name="view_mode">graph,pivot,list</field>
+        <field name="search_view_id" ref="educational_student_report_search"/>
+        <field name="context">{
+            'search_default_all_students': 1,
+            'search_default_group_status': 1,
+            'graph_measure': '__count__',
+            'pivot_measures': ['confirmed_students', 'withdrawn_students']
+        }</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Comprehensive analysis of student performance and enrollments.
+            </p>
+        </field>
+    </record>
+
+    <record id="educational_report_course_action" model="ir.actions.act_window">
+        <field name="name">Course/Program Analysis</field>
+        <field name="res_model">educational.course.report</field>
+        <field name="view_mode">graph,pivot,list</field>
+        <field name="search_view_id" ref="educational_course_report_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Analyze course and program performance.
+            </p>
+        </field>
+    </record>
+
+
+    <record id="academy_performance_jucct_action" model="ir.actions.act_window">
+        <field name="name">Academy Performance Analysis</field>
+        <field name="res_model">academy.performance.report</field>
+        <field name="view_mode">graph,pivot,list</field> 
+        <field name="search_view_id" ref="view_academy_performance_report_search"/>
+        <field name="context">
+            {
+                'graph_report_mode': True, 
+                'graph_type': 'bar', 
+                'search_default_group_by_academy': 1,
+                'group_by': 'academy_id'
+            }
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="educational_report_enrollment_jucct_action" model="ir.actions.act_window">
+        <field name="name">Enrollment Reports</field>
+        <field name="res_model">educational.enrollment.report</field>
+        <field name="view_mode">graph,pivot,list</field>
+        <field name="search_view_id" ref="educational_enrollment_report_search"/>
+        <field name="context">
+            {
+                'orderby': 'enrollment_date desc',
+                'graph_measure': 'enrollment_count',
+                'pivot_measures': ['enrollment_count', 'paid_amount', 'withdrawal_fine']
+            }
+        </field>
+    </record>
+
+</odoo>

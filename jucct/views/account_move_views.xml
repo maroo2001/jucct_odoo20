@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>  
+        <record id="view_move_list_inherit_program_fields" model="ir.ui.view">
+            <field name="name">account.move.list.jucct</field>
+            <field name="model">account.move</field>
+
+            <field name="arch" type="xml">
+            <list create="false"> 
+                    <field name="currency_id" optional="hide" readonly="state in ['cancel', 'posted']"/>
+                    <field name="partner_id" string="Student"/>
+                    <field name="program_type"/>
+                    <field name="is_enrollment"/>
+                    <field name="university_id"/>
+                    <field name="create_uid" string="created by"/>
+                    <field name="amount_enrollment" string="Total" sum="Total" optional="show"/>
+                    <field name="amount_paid" string="paid" sum="paid Total" optional="show"/>
+                    <field name="amount_due_with" string="Amount Due" sum="total due" optional="show" widget="monetary"/>
+                    <field name="status_in_payment"
+                           string="Status"
+                           widget="badge"
+                           decoration-info="state == 'draft'"
+                           decoration-danger="payment_state == 'not_paid' and invoice_date_due &lt; context_today().strftime('%Y-%m-%d')"
+                           decoration-warning="payment_state in ('partial', 'in_payment')"
+                           decoration-success="payment_state in ('paid', 'reversed')"
+                           invisible="payment_state == 'invoicing_legacy' or move_type == 'entry'"
+                           optional="show"
+                    />
+
+                    
+
+            </list>
+            </field>
+        </record>
+
+        <record id="educational_customer_invoices_jucct_action" model="ir.actions.act_window">
+    <field name="name">Enrollment Invoices</field>
+    <field name="res_model">account.move</field>
+    <field name="view_mode">list,form</field>
+    <field name="view_id" ref="view_move_list_inherit_program_fields"/>
+    <field name="domain">[('is_enrollment','=',True)]</field>
+    <field name="context">{'default_is_enrollment': True , 'create': False}</field>
+   
+
+</record>
+
+    <record id="account_move_form_juccty_view" model="ir.ui.view">
+        <field name="name">account.move.form.jucct</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml" >
+        <xpath expr="//div[hasclass('document_tax_mode')]" position="attributes">
+            <attribute name="invisible">is_enrollment == 1</attribute>
+        </xpath>
+        <xpath expr="//field[@id='document_tax_mode_mobile']" position="attributes">
+            <attribute name="invisible">is_enrollment == 1</attribute>
+        </xpath>
+        <form position="attributes">
+        <attribute name="create">is_enrollment == 0</attribute></form>
+            <header position="after">
+            <div class="alert alert-danger"
+            invisible="not has_late_payments or is_enrollment == 0">
+        ⚠ One or more installments are overdue.
+        </div>
+            </header>
+                                <button name="action_reverse" 
+                                invisible="move_type not in ('out_invoice', 'in_invoice') or state != 'posted'"
+                               position="attributes">
+            <attribute name="invisible">move_type not in ('out_invoice', 'in_invoice') or state != 'posted' or is_enrollment == 1</attribute>
+        </button>
+                        <button class="oe_stat_button"
+                        name="action_view_source_sale_orders"
+                        position="replace">
+                        <button class="oe_stat_button"
+                        name="action_view_source_sale_orders"
+                        type="object"
+                        icon="edit_square"
+                        invisible="sale_order_count == 0 or move_type not in ('out_invoice', 'out_refund', 'in_invoice', 'in_refund', 'out_receipt', 'in_receipt') or is_enrollment == 1">
+                    <field string="Sale Orders" name="sale_order_count" widget="statinfo"/>
+                </button>
+                                <button class="oe_stat_button"
+                        name="action_view_source_sale_orders"
+                        type="object"
+                        icon="edit_square"
+                        invisible="sale_order_count == 0 or move_type not in ('out_invoice', 'out_refund', 'in_invoice', 'in_refund', 'out_receipt', 'in_receipt') or is_enrollment == 0">
+                    <field string="enrolments" name="sale_order_count" widget="statinfo"/>
+                </button>
+                </button>
+            <field name="partner_id" position="after">
+                <field name="is_enrollment" invisible="1"/>
+                <field name="program_type" invisible="1"/>
+                </field>
+            <div class="o_td_label" position="before">
+            <label string="Payment Plan:" class="o_form_label o_td_label" for="payment_plan"/>
+            <div class="o_form_field o_td_field">
+            <field name="payment_plan" string="Payment Plan" invisible="move_type not in ('out_invoice', 'out_refund', 'in_invoice', 'in_refund', 'out_receipt', 'in_receipt') or is_enrollment == 0"/>
+                <button
+                    name="toggle_payment_plan"
+                    type="object"
+                    icon="visibility"
+                    class="oe_inline"
+                    title="Show / Hide Payment Plan"/>
+
+                <!-- ⏱️ View delays -->
+                <button
+                    name="action_delay"
+                    type="object"
+                    icon="schedule"
+                    class="oe_inline"
+                    title="View Payment Delays"/>
+            </div>
+            </div>
+            <div class="o_td_label" position="attributes">
+            <attribute name="invisible">move_type not in ('out_invoice', 'out_refund', 'in_invoice', 'in_refund', 'out_receipt', 'in_receipt') or payment_plan == 'full'</attribute>
+            </div>
+            <field name="invoice_payment_term_id" position="attributes">
+            <attribute name="invisible">move_type not in ('out_invoice', 'out_refund', 'in_invoice', 'in_refund', 'out_receipt', 'in_receipt') or payment_plan == 'full'</attribute>
+            </field>
+            <label for="journal_id" position="attributes">
+            <attribute name="invisible">is_enrollment == 1</attribute>
+          </label>
+            <div name="journal_div" position="attributes">
+            <attribute name="invisible">is_enrollment == 1</attribute>
+          </div>
+           <page id="aml_tab" position="attributes">
+            <attribute name="invisible">is_enrollment == 1</attribute>
+          </page>
+             <field name="account_id"
+                context="{'partner_id': partner_id, 'move_type': parent.move_type}"
+                groups="account.group_account_readonly"
+                options="{'no_quick_create': True}"
+                domain="[('deprecated', '=', False), ('company_ids', 'parent_of', company_id), ('account_type', 'not in', ('asset_receivable', 'liability_payable', 'off_balance'))]"
+                required="display_type not in ('line_note', 'line_section')" position="attributes">
+            <attribute name="column_invisible">parent.is_enrollment == 1</attribute>
+          </field>
+
+            <field name="partner_id" position="replace">
+            <field name="partner_id" domain="[('edu_type', 'in', ['student'])]" string="Student" context="{'default_edu_type': 'student', 'form_view_ref': 'jucct.student_jucct_form_view'}" invisible="move_type not in ('out_invoice', 'out_refund', 'out_receipt') or is_enrollment == 0"/>
+            <field name="partner_id" widget="res_partner_many2one" nolabel="1"
+                                           context="{
+                                            'res_partner_search_mode': (context.get('default_move_type', 'entry') in ('out_invoice', 'out_refund', 'out_receipt') and 'customer') or (context.get('default_move_type', 'entry') in ('in_invoice', 'in_refund', 'in_receipt') and 'supplier') or False,
+                                            'show_address': 1, 'default_is_company': True, 'show_vat': True}"
+                                           domain="[('company_id', 'in', (False, company_id))]"
+                                           options='{"no_quick_create": True}'
+                                           default_focus="1"
+                                           invisible="move_type not in ('out_invoice', 'out_refund', 'in_invoice', 'in_refund', 'out_receipt', 'in_receipt' ) or is_enrollment == 1"
+                                           placeholder="Search a name or Tax ID..."
+                                           readonly="state != 'draft'"/>
+            </field>
+             <field name="partner_shipping_id" position="before">
+                <field name="is_withdraw" invisible="1"/>
+                <field name="university_id" string="Student ID" readonly="1" invisible="is_enrollment == 0"/>
+                <field name="withdrawal_fine" string="Withdrawal Fine" readonly="1" invisible="is_enrollment == 0 or is_withdraw == 0"/>
+            </field>
+            <field name="id" position="before">
+            <widget name="web_ribbon" title="Withdrawn" invisible="is_withdraw == 0"/>
+            </field>
+             <button name="action_register_payment" id="account_invoice_payment_btn" position="attributes">
+                <attribute name="invisible">(
+                                    state != 'posted'
+                                    or payment_state not in ('not_paid', 'partial', 'in_payment')
+                                    or move_type not in ('out_invoice', 'out_refund', 'in_invoice', 'in_refund', 'out_receipt', 'in_receipt')
+                                    or invoice_has_outstanding
+                                    or is_withdraw == 1
+                                )</attribute> </button>
+
+        <label for="partner_id"  style="font-weight:bold;" invisible="move_type not in ('out_invoice', 'out_refund', 'out_receipt')" position="replace">
+            <label for="partner_id" string="Student" style="font-weight:bold;" invisible="move_type not in ('out_invoice', 'out_refund', 'out_receipt') or is_enrollment == 0"/>
+            <label for="partner_id" string="Customer" style="font-weight:bold;" invisible="move_type not in ('out_invoice', 'out_refund', 'out_receipt') or is_enrollment"/>
+        </label>
+        <span class="o_form_label" position="attributes">
+            <attribute name="invisible">is_enrollment == 1</attribute>
+            </span>
+        <field name="invoice_line_ids" widget="product_label_section_and_note_field_o2m" position="attributes">
+            <attribute name="readonly">state != 'draft' or is_enrollment == 1</attribute>
+        </field>
+        <page id="other_tab"  name="other_info" position="attributes">
+            <attribute name="invisible">is_enrollment == 1</attribute>
+        </page>
+        <page id="other_tab_entry"  name="other_info" position="attributes">
+            <attribute name="invisible">is_enrollment == 1</attribute>
+            </page>
+        <field name="quantity" optional="show" position="attributes">
+            <attribute name="column_invisible">parent.is_enrollment == 1</attribute>
+            </field>
+        <field name="price_unit" position="attributes">
+            <attribute name="column_invisible">parent.is_enrollment == 1</attribute>
+            </field>
+        <field name="tax_ids" position="attributes">
+            <attribute name="column_invisible">parent.is_enrollment == 1</attribute>
+            </field>
+        <!-- Odoo 20: product_id + name + label are wrapped in <column name="product_and_description">.
+             Hide that whole column for enrollment invoices and add our own columns AFTER it,
+             otherwise our fields get merged inside the single "Product" column. -->
+        <column name="product_and_description" position="attributes">
+            <attribute name="column_invisible">parent.is_enrollment == 1</attribute>
+        </column>
+        <column name="product_and_description" position="after">
+        <field name="product_id" domain="[('is_program', '=', True)]" string="Program Name" context="{'default_is_program': True, 'form_view_ref': 'jucct.educational_jucct_form_view'}" column_invisible="parent.is_enrollment == 0"/>
+        <field name="academy_id" domain="[('edu_type', '=', 'academy')]" context="{'default_edu_type': 'academy', 'form_view_ref': 'jucct.academy_jucct_form_view'}" column_invisible="parent.is_enrollment == 0"/>
+        <field name="class_offering_id" string="Offering" domain="[('program_id', '=', product_id), ('status', '=' , 'active'), ('academy_id', '=', academy_id)]" context="{'default_program_id': product_id, 'default_academy_id': academy_id}" column_invisible=" parent.is_enrollment == 0"/>
+        <field name="year" column_invisible=" parent.program_type == 'course' or  parent.is_enrollment == 0"/>
+        <field name="semester" column_invisible=" parent.program_type == 'course' or parent.is_enrollment == 0"/>
+        </column>
+        <xpath expr="//field[@name='tax_totals']/.." position="attributes">
+        <attribute name="invisible">move_type not in ('out_invoice', 'out_refund', 'in_invoice', 'in_refund', 'out_receipt', 'in_receipt') or payment_state == 'invoicing_legacy' or is_enrollment == 1</attribute>
+        </xpath>
+        <xpath expr="//field[@name='invoice_outstanding_credits_debits_widget']/.." position="before">
+            <group class="oe_subtotal_footer" invisible="is_enrollment == 0">
+                <field name="amount_total" string="Total Amount" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="invoice_payments_widget" colspan="2" nolabel="1" widget="payment"/>
+                <field name="amount_due_with" string="Amount Due" widget="monetary" options="{'currency_field': 'currency_id'}" invisible="is_withdraw == 1"/>
+            </group>
+       </xpath>
+        <!-- Payment plan: goes in the LEFT part of the footer (2/3 width), totals stay on the right at the same level -->
+        <xpath expr="//group[hasclass('oe_invoice_lines_tab')]//field[@name='narration']" position="before">
+            <div colspan="2" class="w-100 mb-3" invisible="is_enrollment == 0 or not show_payment_plan">
+                <h5 class="fw-bold">Payment Plan</h5>
+                <field name="payment_plan_details" nolabel="1" widget="raw" class="w-100"/>
+            </div>
+        </xpath>
+        <field name="narration" nolabel="1" position="after">
+            <field name="create_uid" string="Created by" readonly="1" invisible="is_enrollment==0"/>
+            </field>
+            <field name="narration" nolabel="1" position="replace">
+            <field name="narration" nolabel="1" placeholder="Terms and conditions..." invisible="is_enrollment==1"/>
+            <field name="narration" nolabel="1" placeholder="notes" invisible="is_enrollment==0"/>
+            </field>
+
+
+        </field>
+        </record>
+        <record id="educational_invoice_search_view" model="ir.ui.view">
+    <field name="name">account.move.search.enrollment</field>
+    <field name="model">account.move</field>
+    <field name="arch" type="xml">
+        <search string="Enrollment Invoices">
+            <field name="name" string="Invoice Ref" filter_domain="[('name', 'ilike', self)]"/>
+            <field name="partner_id" string="Student" filter_domain="[('partner_id', 'ilike', self)]"/>
+            <field name="university_id"/>
+            <field name="program_type"/>
+            <field name="invoice_date"/>
+
+            <separator/>
+            
+            <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
+            <filter string="Posted" name="posted" domain="[('state', '=', 'posted')]"/>
+            <filter string="Withdrawn" name="filter_withdraw" domain="[('is_withdraw', '=', True)]"/>
+            <filter string="Not Paid" name="filter_not_paid" domain="[('payment_state', 'in', ('not_paid', 'invoicing_legacy'))]"/>
+            <filter string="Paid" name="filter_paid" domain="[('payment_state', 'in', ('paid', 'reversed'))]"/>
+
+            <separator/>
+
+            <group>
+                <filter string="Student" name="group_by_partner" context="{'group_by': 'partner_id'}"/>
+                <filter string="Status" name="group_by_state" context="{'group_by': 'state'}"/>
+                <filter string="Program Type" name="group_by_program_type" context="{'group_by': 'program_type'}"/>
+                <filter string="Invoice Date" name="group_by_invoice_date" context="{'group_by': 'invoice_date'}"/>
+                <filter string="Academy" name="group_by_academy" context="{'group_by': 'academy_id'}"/>
+            </group>
+        </search>
+    </field>
+</record>
+<record id="view_delay_list" model="ir.ui.view">
+            <field name="name">account.move.payment.delay.list</field>
+            <field name="model">account.move.payment.delay</field>
+
+            <field name="arch" type="xml">  
+            <list editable="bottom">
+                    <field name="approval_date"/>
+                    <field name="delay_days" />
+                    <field name="reason"/>
+                    </list>
+            </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ========================================================= -->
+    <!-- Financial Settlement Form - UPDATED -->
+    <!-- ========================================================= -->
+    <record id="academy_settlement_jucct_form_view" model="ir.ui.view">
+        <field name="name">academy.financial.settlement.form</field>
+        <field name="model">academy.financial.settlement</field>
+        <field name="arch" type="xml">
+            <form string="Financial Settlement">
+                <header>
+                    <button type="object" name="action_print_invoice" string="Print Settlement" class="btn-primary" icon="print"/>
+                    <button type="object" name="action_mark_as_paid" string="Confirm" class="btn-primary" icon="check"/>
+                </header>
+
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button type="object" name="action_open_student_payments" class="oe_stat_button" icon="group">
+                            <field name="student_count" widget="statinfo" string="Students"/>
+                        </button>
+                    </div>
+                    
+                    <div class="oe_title">
+                        <h1>
+                            <field name="display_name" string="Settlement Reference"/>
+                        </h1>
+                    </div>
+
+                    <!-- Settlement Info -->
+                    <group>
+                        <group string="Basic Info">
+                            <field name="academy_id" string="Academy" 
+                                   options="{'no_create': True, 'no_open': True, 'no_create_edit': True, 'no_quick_create': True}"
+                                   context="{'list_view_ref': 'jucct.res_partner_academy_settlement_list_view', 'search_view_ref': 'jucct.res_partner_academy_settlement_search_view'}"
+                                   readonly="settlement_status != 'draft'"/>
+                            
+                            <field name="program_id" string="Program" 
+                                   options="{'no_create': True, 'no_open': True, 'no_create_edit': True, 'no_quick_create': True}"
+                                   context="{'list_view_ref': 'jucct.product_template_settlement_list_view'}"
+                                   domain="[('offering_ids.academy_id', '=', academy_id)]"
+                                   readonly="settlement_status != 'draft'"/>
+			<field name="offering_id" string="Program Offering"
+			           options="{'no_create': True, 'no_open': True, 'no_create_edit': True, 'no_quick_create': True}"
+          			   domain="[('academy_id', '=', academy_id), ('program_id', '=', program_id), ('status', 'in', ['active', 'expired']), ('id', 'not in', settled_offering_ids)]"/>
+                            
+                            
+                            <field name="program_price" string="Program Price"/>
+                            
+                            <field name="commission_rate_percent" string="Academy Commission Rate %" readonly="1"/>
+                            
+                            <field name="invoice_number" string="Invoice Number" invisible="not invoice_number"/>
+                        </group>
+
+                        <group string="Financial Summary">
+                            <field name="total_students" string="Enrolled Students"/>
+                            <field name="active_students" string="Active/Completed Students"/>
+                            <field name="total_paid_amount" string="Total Paid Amount"/>
+                            <field name="academy_share" string="Academy Share (Revenue Share %)"/>
+                            <field name="center_share" string="Center Share"/>
+                            <field name="settlement_date" string="Settlement Date"/>
+                            
+                            <!-- حقل حالة التسوية -->
+                            <field name="settlement_status" string="Settlement Status" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- ========================================================= -->
+    <!-- Custom list View for Academy Selection -->
+    <!-- ========================================================= -->
+    <record id="res_partner_academy_settlement_list_view" model="ir.ui.view">
+        <field name="name">res.partner.academy.settlement.list</field>
+        <field name="model">res.partner</field>
+        <field name="arch" type="xml">
+            <list string="Academies">
+                <field name="name" string="Academy Name"/>
+                <field name="revenue_share" string="Revenue Share %"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ========================================================= -->
+    <!-- Custom list View for Program Selection -->
+    <!-- ========================================================= -->
+    <record id="product_template_settlement_list_view" model="ir.ui.view">
+        <field name="name">product.template.settlement.list</field>
+        <field name="model">product.template</field>
+        <field name="arch" type="xml">
+            <list string="Programs">
+                <field name="name" string="Program Name"/>
+                <field name="list_price" string="Program Price"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ========================================================= -->
+    <!-- Financial Settlement List View -->
+    <!-- ========================================================= -->
+    <record id="view_academy_financial_settlement_list" model="ir.ui.view">
+        <field name="name">academy.financial.settlement.list</field>
+        <field name="model">academy.financial.settlement</field>
+        <field name="arch" type="xml">
+            <list string="Financial Settlements">
+                <field name="currency_id" column_invisible="1"/>
+                <field name="display_name" string="Settlement"/>
+                <field name="academy_id" string="Academy"/>
+                <field name="program_id" string="Program"/>
+                <field name="program_price" string="Program Price"/>
+                <field name="settlement_status" string="Status"/>
+                <field name="total_students" string="Enrolled Students"/>
+                <field name="active_students" string="Active/Completed Students"/>
+                <field name="total_paid_amount" string="Total Paid Amount" sum="1"/>
+                <field name="academy_share" string="Academy Share" sum="1"/>
+                <field name="center_share" string="Center Share" sum="1"/>
+                <field name="settlement_date" string="Settlement Date"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ========================================================= -->
+    <!-- Student Payments Form View - FIXED -->
+    <!-- ========================================================= -->
+    <record id="view_academy_student_payment_form" model="ir.ui.view">
+        <field name="name">academy.student.payment.form</field>
+        <field name="model">academy.student.payment</field>
+        <field name="arch" type="xml">
+            <form string="Student Payment">
+                <sheet>
+                    <group>
+                        <group string="Student Info">
+                            <field name="student_id" string="Student"
+                                   context="{'default_edu_type': 'student', 'form_view_ref': 'jucct.student_jucct_form_view', 'list_view_ref': 'jucct.student_jucct_list_view', 'search_view_ref': 'jucct.student_jucct_search_view'}"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="program_id" string="Program"/>
+                        </group>
+                        <group string="Payment Details">
+                            <field name="total_paid" string="Paid Amount" readonly="1"/>
+                            <field name="is_withdrawn" string="Withdrawn" readonly="1"/>
+                            <field name="penalty_amount" string="Penalty Amount" readonly="1"/>
+                            <field name="academy_share" string="Academy Share" readonly="1"/>
+                            <field name="center_share" string="Center Share" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- ========================================================= -->
+    <!-- Student Payments List View - FIXED -->
+    <!-- ========================================================= -->
+    <record id="view_academy_student_payment_list" model="ir.ui.view">
+        <field name="name">academy.student.payment.list</field>
+        <field name="model">academy.student.payment</field>
+        <field name="arch" type="xml">
+            <list string="Student Payments" editable="bottom">
+                <field name="currency_id" column_invisible="1"/>
+                <field name="student_id" string="Student"
+                       context="{'default_edu_type': 'student', 'form_view_ref': 'jucct.student_jucct_form_view'}"
+                       options="{'no_create': True}"/>
+                <field name="program_id" string="Program"/>
+                <field name="total_paid" string="Paid Amount" sum="1"/>
+                <field name="is_withdrawn" string="Withdrawn"/>
+                <field name="penalty_amount" string="Penalty Amount" sum="1"/>
+                <field name="academy_share" string="Academy Share" sum="1"/>
+                <field name="center_share" string="Center Share" sum="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_academy_financial_settlement_search" model="ir.ui.view">
+        <field name="name">academy.financial.settlement.search</field>
+        <field name="model">academy.financial.settlement</field>
+        <field name="arch" type="xml">
+            <search string="Search Financial Settlement">
+                <field name="display_name" string="Settlement"/>
+                <field name="academy_id" string="Academy"/>
+                <field name="program_id" string="Program"/>
+                <field name="settlement_status" string="Status"/>
+                
+                <group>
+                    <filter string="Academy" name="group_by_academy" context="{'group_by':'academy_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+</odoo>

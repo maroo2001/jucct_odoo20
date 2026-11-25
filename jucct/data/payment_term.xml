@@ -1,0 +1,21 @@
+<odoo>
+    <!-- Payment Term: 10% every month -->
+    <record id="payment_term_10_percent_monthly" model="account.payment.term">
+        <field name="name">10% Every Month</field>
+        <field name="note">10% payment each month for 10 months</field>
+        <field name="active">True</field>
+        <field name="company_id" ref="base.main_company"/>
+        <field name="line_ids" eval="[ Command.clear()
+        ,Command.create({'value': 'percent', 'value_amount': 10.0, 'nb_days': 0})
+        ,Command.create({'value': 'percent', 'value_amount': 10.0, 'nb_days': 30})
+        ,Command.create({'value': 'percent', 'value_amount': 10.0, 'nb_days': 60})
+        ,Command.create({'value': 'percent', 'value_amount': 10.0, 'nb_days': 90})
+        ,Command.create({'value': 'percent', 'value_amount': 10.0, 'nb_days': 120})
+        ,Command.create({'value': 'percent', 'value_amount': 10.0, 'nb_days': 150})
+        ,Command.create({'value': 'percent', 'value_amount': 10.0, 'nb_days': 180})
+        ,Command.create({'value': 'percent', 'value_amount': 10.0, 'nb_days': 210})
+        ,Command.create({'value': 'percent', 'value_amount': 10.0, 'nb_days': 240})
+        ,Command.create({'value': 'percent', 'value_amount': 10.0, 'nb_days': 270}) ]
+        "/>
+        </record>
+</odoo>
