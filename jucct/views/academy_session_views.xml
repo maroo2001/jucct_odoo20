@@ -111,6 +111,7 @@
                     <field name="academy_trainer_ids" invisible="1"/>
                     <field name="offering_trainer_ids" invisible="1"/>
                     <field name="available_offering_ids" invisible="1"/>
+                    <field name="available_program_ids" invisible="1"/>
                     <field name="record_type" invisible="1"/>
                     
                     <group>

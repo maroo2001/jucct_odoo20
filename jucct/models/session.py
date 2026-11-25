@@ -48,6 +48,34 @@ class AcademySession(models.Model):
             else:
                 session.available_academy_ids = [(6, 0, [self.env.company.partner_id.id])]
 
+    available_program_ids = fields.Many2many(
+        'product.template',
+        compute='_compute_available_programs',
+        store=False,
+        string='Available Programs'
+    )
+
+    @api.depends('academy_id')
+    def _compute_available_programs(self):
+        """Programs offered by the selected academy. No academy (or the center itself): all programs."""
+        Offering = self.env['academy.program.offering']
+        Program = self.env['product.template']
+        center_id = self.env.company.partner_id.id
+        for session in self:
+            if session.academy_id and session.academy_id.id != center_id:
+                programs = Offering.search([('academy_id', '=', session.academy_id.id)]).mapped('program_id')
+            else:
+                programs = Program.search([('is_program', '=', True)])
+            session.available_program_ids = programs
+
+    @api.onchange('academy_id')
+    def _onchange_academy_clear_program(self):
+        """If the new academy does not offer the selected program, clear program and offering."""
+        for session in self:
+            if session.academy_id and session.program_id and session.program_id not in session.available_program_ids:
+                session.program_id = False
+                session.offering_id = False
+
 
 
     center_partner_id = fields.Many2one(
@@ -83,7 +111,7 @@ class AcademySession(models.Model):
         'product.template',
         string='Program',
         required=True,
-        domain="[('is_program', '=', True), ('program_type', '!=', False), ('program_type', '=', program_type)]",
+        domain="[('is_program', '=', True), ('program_type', '!=', False), ('program_type', '=', program_type), ('id', 'in', available_program_ids)]",
         compute='_compute_from_offering',
         store=True,
         readonly=False
